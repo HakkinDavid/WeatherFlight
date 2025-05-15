@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BeginScreen: View {
+    @StateObject private var permissionsViewModel = PermissionsViewModel()
     var body: some View {
     
         
@@ -19,17 +20,28 @@ struct BeginScreen: View {
                 .ignoresSafeArea()
             
             VStack {
-                Text("WEATHERBYTE")
+                Text("Weather Flight")
                     .font(.title)
                     .foregroundColor(.white)
-                    .frame(maxWidth: 300)
+                    .frame(maxWidth: 300, minHeight: 80)
                     .background(Color.black.opacity(0.25))
-                    .cornerRadius(10)
+                    .cornerRadius(800)
                     .position(x:185,y:200)
                     .padding()
-                Spacer()
+                
+                Button(action: {
+            permissionsViewModel.requestLocationAccess()
+                }) {
+                    Text("Please grant location access!")
+                        .font(.headline)
+                        .frame(maxWidth: 300, minHeight: 44)
+                }
+                .disabled(permissionsViewModel.locationGranted)
+                .buttonStyle(.borderedProminent)
+                .tint(.black.opacity(0.75))
+                .position(x: 200, y: 75)
             }
-            .navigationTitle("Profile")
+            
         }
         
     }
