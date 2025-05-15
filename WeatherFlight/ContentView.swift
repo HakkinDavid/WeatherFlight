@@ -18,16 +18,16 @@ struct ContentView: View {
                 }
             SearchView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
                 .tabItem {
-                    Image(systemName: "square.grid.2x2.fill")
-                    Text("Category")
+                    Image(systemName: "airplane")
+                    Text("Flights")
                 }
             SearchView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
                 .tabItem {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add")
+                    Image(systemName: "calendar")
+                    Text("Schedule")
                 }
         }
-        .accentColor(.purple)
+        .accentColor(.black)
     }
 }
 

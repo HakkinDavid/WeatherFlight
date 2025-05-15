@@ -25,20 +25,14 @@ struct SearchView: View {
                     } label: {
                         Text(item.timestamp!, formatter: itemFormatter)
                     }
+                    .listRowBackground(Color.white.opacity(0.4))
                 }
                 .onDelete(perform: deleteItems)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-            Text("Select an item")
+            .scrollContentBackground(.hidden)
+            .navigationTitle("Search for flights")
+            .padding(.top, 10)
+            .background(LinearGradient(colors: [.blue, .cyan, .cyan, .yellow], startPoint: .top, endPoint: .bottom))
         }
     }
 
