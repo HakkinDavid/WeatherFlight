@@ -13,7 +13,7 @@ struct WeatherFlightApp: App {
 
     var body: some Scene {
         WindowGroup {
-            BeginScreen()
+            PermissionsView()
         }
     }
 }

@@ -17,7 +17,7 @@ class PermissionsViewModel: ObservableObject {
     @Published var locationGranted = false
     
     var areAllPermissionsGranted: Bool {
-        return cameraGranted && photoLibraryGranted && locationGranted
+        return locationGranted
     }
     
     func requestCameraAccess() {
