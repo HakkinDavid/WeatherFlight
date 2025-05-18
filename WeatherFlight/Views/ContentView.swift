@@ -11,20 +11,29 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            SearchView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+            PlanView()
                 .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
+                    Label("Planear", systemImage: "map")
                 }
-            SearchView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+
+            WeatherView(destination: destinations[0], date: Date())
                 .tabItem {
-                    Image(systemName: "airplane")
-                    Text("Flights")
+                    Label("Clima", systemImage: "cloud.sun")
                 }
-            SearchView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+
+            ActivitiesView()
                 .tabItem {
-                    Image(systemName: "calendar")
-                    Text("Schedule")
+                    Label("Actividades", systemImage: "star")
+                }
+
+            AgendaView()
+                .tabItem {
+                    Label("Agenda", systemImage: "calendar")
+                }
+
+            ProfileView()
+                .tabItem {
+                    Label("Perfil", systemImage: "person.crop.circle")
                 }
         }
         .accentColor(.black)
