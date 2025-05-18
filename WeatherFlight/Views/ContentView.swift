@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -7,6 +8,7 @@ struct ContentView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
+    var currentLatLong = CLLocationManager().location?.coordinate
 
 
     var body: some View {
@@ -16,7 +18,7 @@ struct ContentView: View {
                     Label("Planear", systemImage: "map")
                 }
 
-            WeatherView(destination: destinations[0], date: Date())
+            WeatherView(destination: Destination(name: "Ubicación actual", location: "México", latitude: currentLatLong?.latitude ?? 32.5027, longitude: currentLatLong?.longitude ?? -117.00371), date: Date())
                 .tabItem {
                     Label("Clima", systemImage: "cloud.sun")
                 }

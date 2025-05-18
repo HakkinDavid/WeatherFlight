@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct PlanView: View {
-    @State private var selectedDestination: Destination? = nil
+    @State private var selectedDestination: Destination? = destinations.first
     @State private var selectedDate = Date()
     @State private var navigate = false
 
@@ -19,7 +19,7 @@ struct PlanView: View {
                 Section(header: Text("Destino")) {
                     Picker("Selecciona una ciudad", selection: $selectedDestination) {
                         ForEach(destinations) { destination in
-                            Text(destination.name).tag(Optional(destination))
+                            Text(destination.name + ", " + destination.location).tag(Optional(destination))
                         }
                     }
                 }
@@ -29,16 +29,11 @@ struct PlanView: View {
                 }
 
                 Section {
-                    Button("Buscar clima y actividades") {
-                        navigate = true
+                    NavigationLink(destination: WeatherView(destination: selectedDestination ?? destinations[0], date: selectedDate)) {
+                            Text("Buscar clima y actividades")
                     }
                     .disabled(selectedDestination == nil)
                 }
-
-                NavigationLink(destination: WeatherView(destination: selectedDestination ?? destinations[0], date: selectedDate), isActive: $navigate) {
-                    EmptyView()
-                }
-                .hidden()
             }
             .navigationTitle("Planificar viaje")
         }

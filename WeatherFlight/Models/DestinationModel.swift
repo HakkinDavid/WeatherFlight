@@ -23,9 +23,9 @@ struct Destination: Identifiable, Codable, Hashable {
 }
 
 let destinations: [Destination] = [
-    Destination(name: "Salsipuedes, B.C.", location: "México", latitude: 28.72611, longitude: -112.95527),
-    Destination(name: "Válgame Dios, Sinaloa", location: "México", latitude: 25.54621, longitude: -107.38681),
-    Destination(name: "Xbox, Yucatán", location: "México", latitude: 20.20388, longitude: -107.38681),
-    Destination(name: "Naco, Sonora", location: "México", latitude: 31.33166, longitude: -109.94805),
-    Destination(name: "Berga, Cataluña", location: "España", latitude: 42.10000, longitude: 1.84555)
+    Destination(name: "Salsipuedes", location: "B.C., México", latitude: 28.72611, longitude: -112.95527),
+    Destination(name: "Válgame Dios", location: "Sinaloa, México", latitude: 25.54621, longitude: -107.38681),
+    Destination(name: "Xbox", location: "Yucatán, México", latitude: 20.20388, longitude: -107.38681),
+    Destination(name: "Naco", location: "Sonora, México", latitude: 31.33166, longitude: -109.94805),
+    Destination(name: "Berga", location: "Cataluña, España", latitude: 42.10000, longitude: 1.84555)
 ]
