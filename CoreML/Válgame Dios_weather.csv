@@ -1,4 +1,5 @@
 date,temperature,precipitation,humidity,wind,season
+2024-05-16,23.6,0.0,56,14.5,spring
 2024-05-17,24.2,0.0,53,12.9,spring
 2024-05-18,25.4,0.0,53,12.8,spring
 2024-05-19,27.1,0.0,57,13.3,spring
@@ -363,5 +364,3 @@ date,temperature,precipitation,humidity,wind,season
 2025-05-13,25.4,0.0,43,12.9,spring
 2025-05-14,25.8,0.0,42,13.3,spring
 2025-05-15,26.1,0,42,14.0,spring
-2025-05-16,NA,0,NA,NA,spring
-2025-05-17,NA,0,NA,NA,spring
