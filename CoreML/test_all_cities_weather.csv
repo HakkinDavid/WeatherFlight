@@ -1,0 +1,83 @@
+city,date,temperature,precipitation,humidity,wind,season
+Salsipuedes,05-17,18.9,0.0,84,20.3,spring
+Salsipuedes,05-18,19.0,0.0,82,26.6,spring
+Salsipuedes,05-19,19.3,0.0,63,16.8,spring
+Salsipuedes,05-20,21.5,0.0,68,14.3,spring
+Salsipuedes,05-21,23.0,0.0,59,11.2,spring
+Salsipuedes,05-22,23.6,0.0,65,16.3,spring
+Salsipuedes,05-23,22.6,0.0,66,16.5,spring
+Salsipuedes,05-24,21.5,0.0,78,17.9,spring
+Salsipuedes,05-25,21.5,0.0,69,20.6,spring
+Salsipuedes,05-26,21.2,0.0,77,19.1,spring
+Salsipuedes,05-27,22.1,0.0,70,16.8,spring
+Salsipuedes,05-28,22.0,0.0,80,17.4,spring
+Salsipuedes,05-29,22.1,0.0,85,17.4,spring
+Salsipuedes,05-30,22.1,0.0,80,17.1,spring
+Salsipuedes,05-31,21.8,0.0,94,21.7,spring
+Salsipuedes,06-01,22.2,0.0,90,22.6,spring
+Válgame Dios,05-17,26.8,0.0,27,23.1,spring
+Válgame Dios,05-18,26.9,0.0,31,22.5,spring
+Válgame Dios,05-19,26.6,0.0,30,15.6,spring
+Válgame Dios,05-20,27.8,0.0,23,14.5,spring
+Válgame Dios,05-21,29.4,0.0,25,17.9,spring
+Válgame Dios,05-22,29.1,0.0,26,17.4,spring
+Válgame Dios,05-23,28.5,0.0,28,17.3,spring
+Válgame Dios,05-24,27.4,0.0,36,19.2,spring
+Válgame Dios,05-25,27.5,0.0,36,18.3,spring
+Válgame Dios,05-26,27.4,0.0,32,15.3,spring
+Válgame Dios,05-27,28.1,0.0,29,14.2,spring
+Válgame Dios,05-28,28.2,0.0,38,16.7,spring
+Válgame Dios,05-29,28.1,0.0,56,20.1,spring
+Válgame Dios,05-30,27.3,0.0,60,18.6,spring
+Válgame Dios,05-31,27.4,0.0,63,19.1,spring
+Válgame Dios,06-01,28.1,0.0,59,17.7,spring
+Xbox,05-17,30.5,0.0,96,12.8,spring
+Xbox,05-18,31.2,0.0,94,13.1,spring
+Xbox,05-19,31.6,0.0,92,14.6,spring
+Xbox,05-20,32.5,0.0,87,14.0,spring
+Xbox,05-21,32.0,0.0,91,13.0,spring
+Xbox,05-22,31.2,0.9,95,11.1,spring
+Xbox,05-23,31.0,0.6,96,10.2,spring
+Xbox,05-24,32.9,0.0,91,12.9,spring
+Xbox,05-25,30.3,0.0,100,14.2,spring
+Xbox,05-26,31.0,0.0,100,14.2,spring
+Xbox,05-27,31.2,0.0,99,14.9,spring
+Xbox,05-28,30.7,0.0,100,14.2,spring
+Xbox,05-29,30.6,0.0,100,9.7,spring
+Xbox,05-30,31.0,0.0,100,17.2,spring
+Xbox,05-31,31.4,0.0,93,17.0,spring
+Xbox,06-01,31.1,0.0,92,12.0,spring
+Xbox,06-02,26.0,0,85,9.3,spring
+Naco,05-17,20.9,0.0,23,33.5,spring
+Naco,05-18,18.4,0.0,33,36.8,spring
+Naco,05-19,18.1,0.0,49,35.9,spring
+Naco,05-20,20.1,0.0,27,22.7,spring
+Naco,05-21,22.7,0.0,18,18.9,spring
+Naco,05-22,25.0,0.0,18,22.7,spring
+Naco,05-23,25.5,0.0,18,32.3,spring
+Naco,05-24,23.1,0.0,23,31.1,spring
+Naco,05-25,21.8,0.0,29,34.0,spring
+Naco,05-26,21.7,0.0,25,19.9,spring
+Naco,05-27,23.5,0.0,36,25.1,spring
+Naco,05-28,23.5,0.0,73,35.4,spring
+Naco,05-29,21.9,0.0,26,32.3,spring
+Naco,05-30,23.1,0.0,25,27.5,spring
+Naco,05-31,25.6,0.0,33,15.9,spring
+Naco,06-01,27.3,0.0,24,26.0,spring
+Berga,05-17,15.8,0.1,86,9.0,spring
+Berga,05-18,17.5,0.0,86,19.1,spring
+Berga,05-19,17.8,4.7,91,13.9,spring
+Berga,05-20,15.9,0.1,96,17.6,spring
+Berga,05-21,16.8,4.8,96,17.4,spring
+Berga,05-22,10.9,9.0,93,6.9,spring
+Berga,05-23,13.1,0.0,92,15.6,spring
+Berga,05-24,13.2,0.0,82,21.6,spring
+Berga,05-25,16.1,0.0,90,16.2,spring
+Berga,05-26,13.0,1.5,92,22.9,spring
+Berga,05-27,12.3,0.9,93,23.4,spring
+Berga,05-28,13.1,0.0,92,17.6,spring
+Berga,05-29,15.1,0.0,92,20.1,spring
+Berga,05-30,17.4,0.0,95,11.3,spring
+Berga,05-31,20.9,0.0,83,13.4,spring
+Berga,06-01,20.8,2.4,79,16.6,spring
+Berga,06-02,11.4,0,91,3.6,spring
