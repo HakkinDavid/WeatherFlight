@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject var agendaManager: AgendaManager
     @State private var showingExport = false
     @State private var showingAbout = false
 

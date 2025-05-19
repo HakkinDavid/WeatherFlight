@@ -3,7 +3,8 @@ import CoreLocation
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    @EnvironmentObject var agendaManager: AgendaManager
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
@@ -22,12 +23,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Clima", systemImage: "cloud.sun")
                 }
-
-            ActivitiesView()
-                .tabItem {
-                    Label("Actividades", systemImage: "star")
-                }
-
+                
             AgendaView()
                 .tabItem {
                     Label("Agenda", systemImage: "calendar")

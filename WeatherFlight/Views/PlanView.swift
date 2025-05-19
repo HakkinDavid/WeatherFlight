@@ -9,9 +9,13 @@
 import SwiftUI
 
 struct PlanView: View {
+    @EnvironmentObject var agendaManager: AgendaManager
     @State private var selectedDestination: Destination? = destinations.first
     @State private var selectedDate = Date()
+    @State private var selectedActivities: [Activity] = []
     @State private var navigate = false
+
+    let activities = sampleActivities
 
     var body: some View {
         NavigationView {
@@ -30,12 +34,43 @@ struct PlanView: View {
 
                 Section {
                     NavigationLink(destination: WeatherView(destination: selectedDestination ?? destinations[0], date: selectedDate)) {
-                            Text("Buscar clima y actividades")
+                            Text("Checar clima")
                     }
                     .disabled(selectedDestination == nil)
                 }
+
+                Section(header: Text("Actividades").foregroundColor(selectedDestination == nil ? .gray : .primary)) {
+                    List {
+                        ForEach(activities) { activity in
+                            HStack {
+                                if selectedDestination?.name == activity.destination {
+                                    VStack(alignment: .leading) {
+                                        Text(activity.name).font(.headline)
+                                        Text(activity.description).font(.subheadline)
+                                    }
+                                    Spacer()
+                                    Button(action: {
+                                        toggleActivity(activity)
+                                    }) {
+                                        Image(systemName: agendaManager.items.contains(AgendaItem(activity: activity, date: selectedDate)) ? "checkmark.circle.fill" : "plus.circle")
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
             }
             .navigationTitle("Planificar viaje")
+        }
+    }
+
+    func toggleActivity(_ activity: Activity) {
+        if let index = agendaManager.items.firstIndex(where: { $0 == AgendaItem(activity: activity, date: selectedDate) }) {
+            agendaManager.remove(agendaManager.items[index])
+        } else {
+            agendaManager.add(activity: activity, on: selectedDate)
         }
     }
 }

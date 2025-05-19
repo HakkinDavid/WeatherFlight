@@ -9,11 +9,11 @@ import SwiftUI
 import EventKit
 
 struct AgendaView: View {
-    @State private var agendaItems: [AgendaItem] = []
+    @EnvironmentObject var agendaManager: AgendaManager
     @State private var showingExportAlert = false
 
     var groupedItems: [String: [AgendaItem]] {
-        Dictionary(grouping: agendaItems) { $0.destination.name }
+        Dictionary(grouping: agendaManager.items) { $0.activity.destination }
     }
 
     var body: some View {
@@ -54,12 +54,12 @@ struct AgendaView: View {
         eventStore.requestAccess(to: .event) { granted, _ in
             guard granted else { return }
 
-            for item in agendaItems {
+            for item in agendaManager.items {
                 let event = EKEvent(eventStore: eventStore)
                 event.title = item.activity.name
                 event.startDate = item.date
                 event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: item.date)
-                event.notes = "\(item.activity.description) en \(item.destination.name)"
+                event.notes = "\(item.activity.description) en \(item.activity.destination)"
                 event.calendar = eventStore.defaultCalendarForNewEvents
 
                 do {

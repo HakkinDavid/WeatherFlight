@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PermissionsView: View {
-    
+    @EnvironmentObject var agendaManager: AgendaManager
     @StateObject private var permissionsViewModel = PermissionsViewModel()
     @Environment(\.sizeCategory) var sizeCategory
     // Usamos UserDefaults para guardar si los permisos han sido concedidos previamente

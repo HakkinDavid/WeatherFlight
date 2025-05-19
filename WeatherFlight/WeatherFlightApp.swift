@@ -9,11 +9,12 @@ import SwiftUI
 
 @main
 struct WeatherFlightApp: App {
+    @StateObject private var agendaManager = AgendaManager()
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
         WindowGroup {
-            PermissionsView()
+            PermissionsView().environmentObject(agendaManager)
         }
     }
 }

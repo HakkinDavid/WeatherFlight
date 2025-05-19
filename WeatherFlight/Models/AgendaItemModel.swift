@@ -10,5 +10,4 @@ struct AgendaItem: Identifiable, Codable, Hashable {
     let id: UUID
     let activity: Activity
     let date: Date
-    let destination: Destination
 }
