@@ -9,5 +9,11 @@ import SwiftUI
 struct AgendaItem: Identifiable, Codable, Hashable {
     let id: UUID
     let activity: Activity
-    let date: Date
+    let date: DateRange
+    
+    init(activity: Activity, date: DateRange) {
+        self.id = UUID()
+        self.activity = activity
+        self.date = date
+    }
 }

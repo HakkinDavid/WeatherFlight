@@ -8,26 +8,51 @@
 import SwiftUI
 
 struct PlanView: View {
-    @EnvironmentObject var agendaManager: AgendaManager
+    @EnvironmentObject var flightManager: FlightManager
     @State private var selectedDestination: Destination? = destinations.first
+    @State private var selectedSeason: String? = "Verano"
     @State private var selectedDate = Date()
     @State private var selectedActivities: [Activity] = []
     @State private var navigate = false
 
     let activities = sampleActivities
+    
+    let textColor = Color(red: 1.0, green: 0.95, blue: 0.7) // Light Yellow
+    
+    let beachGradient = LinearGradient(
+        gradient: Gradient(colors: [ Color(red: 0.1, green: 0.5, blue: 0.8), Color(red: 0.2, green: 0.7, blue: 0.9), Color(red: 0.4, green: 0.65, blue: 0.85), Color(red: 0.8, green: 0.9, blue: 0.55), Color(red: 0.9, green: 0.8, blue: 0.4)]), startPoint: .top, endPoint: .bottom)
+    
 
     var body: some View {
         NavigationView {
-            Form {
-                // Sección de destino
-                Section(header: Text("Destino")) {
-                    Picker("Selecciona una ciudad", selection: $selectedDestination) {
-                        ForEach(destinations) { destination in
-                            Text(destination.name + ", " + destination.location).tag(Optional(destination))
+            ZStack {
+                
+                beachGradient
+                    .edgesIgnoringSafeArea(.all)
+                
+                Form {
+                    // Destiny awaits
+                    Section(header: Text("Destino").foregroundColor(textColor).bold()) {
+                        Picker("Selecciona una ciudad", selection: $selectedDestination) {
+                            ForEach(destinations) { destination in
+                                Text(destination.name + ", " + destination.location)
+                                    .tag(Optional(destination))
+                                    .foregroundColor(.white)
+                            }
                         }
+                        .colorScheme(.dark) // Para mejor visibilidad del picker
+                    }
+                    .listRowBackground(Color.blue.opacity(0.3))
+                }
+                
+                // Sección de fecha
+                Section(header: Text("Temporada de viaje")) {
+                    Picker("Selecciona una temporada", selection: $selectedSeason) {
+                        Text("Verano")
+                        Text("Invierno")
                     }
                 }
-
+                
                 // Sección de fecha
                 Section(header: Text("Fecha del viaje")) {
                     DatePicker(
@@ -37,8 +62,20 @@ struct PlanView: View {
                         displayedComponents: [.date]
                     )
                 }
-
-                // Sección del clima
+                
+                // Date select
+                Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
+                    DatePicker(
+                        "Selecciona una fecha",
+                        selection: $selectedDate,
+                        in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                        displayedComponents: [.date]
+                    )
+                    .colorScheme(.dark)
+                }
+                .listRowBackground(Color.blue.opacity(0.3))
+                
+                // Weather check
                 Section {
                     NavigationLink(
                         destination: WeatherView(
@@ -47,20 +84,39 @@ struct PlanView: View {
                         )
                     ) {
                         Text("Checar clima")
+                            .foregroundColor(textColor)
+                            .bold()
                     }
                     .disabled(selectedDestination == nil)
                 }
-
+                .listRowBackground(Color.blue.opacity(0.4))
+                
+                // Activities
+                Section(
+                    header: Text("Actividades")
+                        .foregroundColor(selectedDestination == nil ? .gray : textColor)
+                ) {
+                    activityListView
+                }
+                .disabled(selectedDestination == nil)
+                
                 // Sección de actividades
                 Section(
                     header: Text("Actividades")
                         .foregroundColor(selectedDestination == nil ? .gray : .primary)
+                        .font(.title2)
                 ) {
                     activityListView
                 }
+                .listRowBackground(Color.blue.opacity(0.4))
             }
-            .navigationTitle("Planificar viaje")
+            .scrollContentBackground(.hidden) // No Form Background
+            .background(Color.clear)
         }
+        .navigationTitle("Planificar viaje")
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarBackground(Color.blue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
     
     // Extraer la lista de actividades a una propiedad computada
@@ -72,8 +128,11 @@ struct PlanView: View {
                     isSelected: isActivitySelected(activity),
                     onTap: { toggleActivity(activity) }
                 )
+                .listRowBackground(Color.blue.opacity(0.2))
             }
         }
+        .listStyle(.plain)
+        .background(Color.clear)
     }
     
     // Filtrar actividades por destino seleccionado
@@ -86,16 +145,14 @@ struct PlanView: View {
     
     // Verificar si una actividad está seleccionada
     private func isActivitySelected(_ activity: Activity) -> Bool {
-        agendaManager.items.contains { item in
-            item.activity.id == activity.id && item.date == selectedDate
-        }
+        selectedActivities.contains(where: { $0.id == activity.id })
     }
 
     func toggleActivity(_ activity: Activity) {
-        if let index = agendaManager.items.firstIndex(where: { $0.activity.id == activity.id && $0.date == selectedDate }) {
-            agendaManager.remove(agendaManager.items[index])
+        if isActivitySelected(activity){
+            selectedActivities.removeAll { $0.id == activity.id }
         } else {
-            agendaManager.add(activity: activity, on: selectedDate)
+            selectedActivities.append(activity)
         }
     }
 }
@@ -121,3 +178,4 @@ struct ActivityRow: View {
         .padding(.vertical, 4)
     }
 }
+

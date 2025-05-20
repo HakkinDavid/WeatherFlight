@@ -17,28 +17,36 @@ struct AgendaView: View {
     }
 
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(groupedItems.keys.sorted(), id: \.self) { city in
-                    Section(header: Text(city)) {
-                        ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
-                            VStack(alignment: .leading) {
-                                Text(item.activity.name).font(.headline)
-                                Text(item.activity.description).font(.subheadline)
-                                Text("📅 \(formattedDate(item.date))").font(.caption)
+        ZStack{
+            
+            Rectangle()
+                .fill(LinearGradient(colors: [.red, .red.opacity(0.8), .red.opacity(0.2), .white], startPoint: .top, endPoint: .bottom))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+            
+            NavigationView {
+                List {
+                    ForEach(groupedItems.keys.sorted(), id: \.self) { city in
+                        Section(header: Text(city)) {
+                            ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
+                                VStack(alignment: .leading) {
+                                    Text(item.activity.name).font(.headline)
+                                    Text(item.activity.description).font(.subheadline)
+                                    Text("📅 \(formattedDate(item.date))").font(.caption)
+                                }
                             }
                         }
                     }
                 }
-            }
-            .navigationTitle("Agenda")
-            .toolbar {
-                Button("Exportar 📆") {
-                    exportToCalendar()
+                .navigationTitle("Agenda")
+                .toolbar {
+                    Button("Exportar 📆") {
+                        exportToCalendar()
+                    }
                 }
-            }
-            .alert("Exportado a Calendario", isPresented: $showingExportAlert) {
-                Button("OK", role: .cancel) { }
+                .alert("Exportado a Calendario", isPresented: $showingExportAlert) {
+                    Button("OK", role: .cancel) { }
+                }
             }
         }
     }
@@ -57,8 +65,8 @@ struct AgendaView: View {
             for item in agendaManager.items {
                 let event = EKEvent(eventStore: eventStore)
                 event.title = item.activity.name
-                event.startDate = item.date
-                event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: item.date)
+                event.startDate = Date() // Had to change the date for now
+                event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())
                 event.notes = "\(item.activity.description) en \(item.activity.destination)"
                 event.calendar = eventStore.defaultCalendarForNewEvents
 

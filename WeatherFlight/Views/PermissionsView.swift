@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PermissionsView: View {
-    @EnvironmentObject var agendaManager: AgendaManager
+    @EnvironmentObject var flightManager: FlightManager
     @StateObject private var permissionsViewModel = PermissionsViewModel()
     @Environment(\.sizeCategory) var sizeCategory
     // Usamos UserDefaults para guardar si los permisos han sido concedidos previamente
@@ -15,7 +15,7 @@ struct PermissionsView: View {
                 ZStack {
                             
                             Rectangle()
-                                .fill(LinearGradient(colors: [.blue.opacity(0.6), .blue, .blue.opacity(0.9), .yellow], startPoint: .topLeading, endPoint: .bottom))
+                                .fill(LinearGradient(colors: [.blue, .blue, .cyan, .yellow], startPoint: .top, endPoint: .bottom))
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .ignoresSafeArea()
                             

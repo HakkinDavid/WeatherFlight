@@ -9,8 +9,8 @@ import SwiftUI
 class AgendaManager: ObservableObject {
     @Published var items: [AgendaItem] = []
 
-    func add(activity: Activity, on date: Date) {
-        let newItem = AgendaItem(id: UUID(), activity: activity, date: date)
+    func add(activity: Activity, on date: DateRange) {
+        let newItem = AgendaItem(activity: activity, date: date)
         items.append(newItem)
     }
 
