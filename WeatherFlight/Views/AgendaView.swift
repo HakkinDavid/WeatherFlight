@@ -65,8 +65,8 @@ struct AgendaView: View {
             for item in agendaManager.items {
                 let event = EKEvent(eventStore: eventStore)
                 event.title = item.activity.name
-                event.startDate = item.date
-                event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: item.date)
+                event.startDate = Date() // Had to change the date for now
+                event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())
                 event.notes = "\(item.activity.description) en \(item.activity.destination)"
                 event.calendar = eventStore.defaultCalendarForNewEvents
 

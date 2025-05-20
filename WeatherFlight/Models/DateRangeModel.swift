@@ -7,21 +7,15 @@
 
 import SwiftUI
 
-struct DateRange: Identifiable {
+struct DateRange: Identifiable, Hashable, Codable {
     let id: UUID
     let startDate: Date
     let endDate: Date
-    let associate_id: UUID?
     
-    init(startDate: Date, endDate: Date, associate_id: UUID? = nil) {
+    init(startDate: Date, endDate: Date) {
         self.id = UUID()
         self.startDate = startDate
         self.endDate = endDate
-        self.associate_id = associate_id
-    }
-    
-    func get_associate_id() -> UUID? {
-        return self.associate_id
     }
     
     func get_start_date() -> Date {

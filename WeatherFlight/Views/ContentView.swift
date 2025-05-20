@@ -3,7 +3,7 @@ import CoreLocation
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var agendaManager: AgendaManager
+    @EnvironmentObject var flightManager: FlightManager
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],

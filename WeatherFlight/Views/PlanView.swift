@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct PlanView: View {
-    @EnvironmentObject var agendaManager: AgendaManager
+    @EnvironmentObject var flightManager: FlightManager
     @State private var selectedDestination: Destination? = destinations.first
+    @State private var selectedSeason: String? = "Verano"
     @State private var selectedDate = Date()
     @State private var selectedActivities: [Activity] = []
     @State private var navigate = false
@@ -28,7 +29,7 @@ struct PlanView: View {
                 
                 beachGradient
                     .edgesIgnoringSafeArea(.all)
-
+                
                 Form {
                     // Destiny awaits
                     Section(header: Text("Destino").foregroundColor(textColor).bold()) {
@@ -42,52 +43,80 @@ struct PlanView: View {
                         .colorScheme(.dark) // Para mejor visibilidad del picker
                     }
                     .listRowBackground(Color.blue.opacity(0.3))
-
-                    // Date select
-                    Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
-                        DatePicker(
-                            "Selecciona una fecha",
-                            selection: $selectedDate,
-                            in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
-                            displayedComponents: [.date]
-                        )
-                        .colorScheme(.dark)
-                    }
-                    .listRowBackground(Color.blue.opacity(0.3))
-
-                    // Weather check
-                    Section {
-                        NavigationLink(
-                            destination: WeatherView(
-                                destination: selectedDestination ?? destinations[0],
-                                date: selectedDate
-                            )
-                        ) {
-                            Text("Checar clima")
-                                .foregroundColor(textColor)
-                                .bold()
-                        }
-                        .disabled(selectedDestination == nil)
-                    }
-                    .listRowBackground(Color.blue.opacity(0.4))
-
-                    // Activities
-                    Section(
-                        header: Text("Actividades")
-                            .foregroundColor(selectedDestination == nil ? .gray : textColor)
-                    ) {
-                        activityListView
-                    }
-                    .listRowBackground(Color.blue.opacity(0.4))
                 }
-                .scrollContentBackground(.hidden) // No Form Background
-                .background(Color.clear)
+                
+                // Sección de fecha
+                Section(header: Text("Temporada de viaje")) {
+                    Picker("Selecciona una temporada", selection: $selectedSeason) {
+                        Text("Verano")
+                        Text("Invierno")
+                    }
+                }
+                
+                // Sección de fecha
+                Section(header: Text("Fecha del viaje")) {
+                    DatePicker(
+                        "Selecciona una fecha",
+                        selection: $selectedDate,
+                        in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                        displayedComponents: [.date]
+                    )
+                }
+                
+                // Date select
+                Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
+                    DatePicker(
+                        "Selecciona una fecha",
+                        selection: $selectedDate,
+                        in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                        displayedComponents: [.date]
+                    )
+                    .colorScheme(.dark)
+                }
+                .listRowBackground(Color.blue.opacity(0.3))
+                
+                // Weather check
+                Section {
+                    NavigationLink(
+                        destination: WeatherView(
+                            destination: selectedDestination ?? destinations[0],
+                            date: selectedDate
+                        )
+                    ) {
+                        Text("Checar clima")
+                            .foregroundColor(textColor)
+                            .bold()
+                    }
+                    .disabled(selectedDestination == nil)
+                }
+                .listRowBackground(Color.blue.opacity(0.4))
+                
+                // Activities
+                Section(
+                    header: Text("Actividades")
+                        .foregroundColor(selectedDestination == nil ? .gray : textColor)
+                ) {
+                    activityListView
+                }
+                .disabled(selectedDestination == nil)
+                
+                // Sección de actividades
+                Section(
+                    header: Text("Actividades")
+                        .foregroundColor(selectedDestination == nil ? .gray : .primary)
+                        .font(.title2)
+                ) {
+                    activityListView
+                }
+                .listRowBackground(Color.blue.opacity(0.4))
             }
-            .navigationTitle("Planificar viaje")
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(Color.blue.opacity(0.5), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .scrollContentBackground(.hidden) // No Form Background
+            .background(Color.clear)
         }
+        .navigationTitle("Planificar viaje")
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarBackground(Color.blue.opacity(0.5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
     }
     
     // Extraer la lista de actividades a una propiedad computada
@@ -116,16 +145,14 @@ struct PlanView: View {
     
     // Verificar si una actividad está seleccionada
     private func isActivitySelected(_ activity: Activity) -> Bool {
-        agendaManager.items.contains { item in
-            item.activity.id == activity.id && item.date == selectedDate
-        }
+        selectedActivities.contains(where: { $0.id == activity.id })
     }
 
     func toggleActivity(_ activity: Activity) {
-        if let index = agendaManager.items.firstIndex(where: { $0.activity.id == activity.id && $0.date == selectedDate }) {
-            agendaManager.remove(agendaManager.items[index])
+        if isActivitySelected(activity){
+            selectedActivities.removeAll { $0.id == activity.id }
         } else {
-            agendaManager.add(activity: activity, on: selectedDate)
+            selectedActivities.append(activity)
         }
     }
 }
