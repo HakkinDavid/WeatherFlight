@@ -38,30 +38,37 @@ struct WeatherView: View {
                         .background(Color.white.opacity(0.7))
                         .cornerRadius(10)
                 } else if let weatherData = weather {
-                    VStack(spacing: 20) {
+                    VStack(spacing: 15) {
                         if weatherData.current.temperature_2m != -273.15 {
                             Text("Actualmente")
-                                .font(.headline)
+                                .font(.system(size: 50))
+                                .position(x: 165, y: 60)
                             Text("\(weatherData.current.temperature_2m, specifier: "%.1f")°C")
-                                .font(.title)
+                                .font(.system(size:28))
+                                .frame(maxWidth: 200, minHeight: 50)
+                                .background(Color.black.opacity(0.125))
+                                .cornerRadius(150)
+                                .position(x: 165, y: 40)
                         }
                         
                         Text("📍 \(destination.name), \(destination.location)")
                             .font(.headline)
+                            .position(x: 165, y: 40)
                         
                         Text("📅 \(formattedDate(date))")
-                            .font(.subheadline)
+                            .font(.system(size: 26))
+                            .position(x: 165, y: 45)
                         
                         HStack {
                             Spacer()
                             sourceLabel
                                 .font(.caption)
-                                .padding(5)
+                                .padding(6)
                                 .background(Color.black.opacity(0.1))
                                 .cornerRadius(5)
                         }
                         
-                        VStack(spacing: 15) {
+                        VStack(spacing: 8) {
                             weatherRow(icon: "🌡️", title: "Temperatura", value: temperatureText(weatherData))
                             
                             weatherRow(icon: "🌧️", title: "Precipitación", value: precipitationText(weatherData))
@@ -75,8 +82,8 @@ struct WeatherView: View {
                             }
                         }
                         .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(15)
+                        .background(Color.white.opacity(0.75))
+                        .cornerRadius(20)
                     }
                     .padding()
                 } else if let error = errorMessage {

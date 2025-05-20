@@ -15,51 +15,78 @@ struct PlanView: View {
     @State private var navigate = false
 
     let activities = sampleActivities
+    
+    let textColor = Color(red: 1.0, green: 0.95, blue: 0.7) // Light Yellow
+    
+    let beachGradient = LinearGradient(
+        gradient: Gradient(colors: [ Color(red: 0.1, green: 0.5, blue: 0.8), Color(red: 0.2, green: 0.7, blue: 0.9), Color(red: 0.4, green: 0.65, blue: 0.85), Color(red: 0.8, green: 0.9, blue: 0.55), Color(red: 0.9, green: 0.8, blue: 0.4)]), startPoint: .top, endPoint: .bottom)
+    
 
     var body: some View {
         NavigationView {
-            Form {
-                // Sección de destino
-                Section(header: Text("Destino")) {
-                    Picker("Selecciona una ciudad", selection: $selectedDestination) {
-                        ForEach(destinations) { destination in
-                            Text(destination.name + ", " + destination.location).tag(Optional(destination))
+            ZStack {
+                
+                beachGradient
+                    .edgesIgnoringSafeArea(.all)
+
+                Form {
+                    // Destiny awaits
+                    Section(header: Text("Destino").foregroundColor(textColor).bold()) {
+                        Picker("Selecciona una ciudad", selection: $selectedDestination) {
+                            ForEach(destinations) { destination in
+                                Text(destination.name + ", " + destination.location)
+                                    .tag(Optional(destination))
+                                    .foregroundColor(.white)
+                            }
                         }
+                        .colorScheme(.dark) // Para mejor visibilidad del picker
                     }
-                }
+                    .listRowBackground(Color.blue.opacity(0.3))
 
-                // Sección de fecha
-                Section(header: Text("Fecha del viaje")) {
-                    DatePicker(
-                        "Selecciona una fecha",
-                        selection: $selectedDate,
-                        in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
-                        displayedComponents: [.date]
-                    )
-                }
-
-                // Sección del clima
-                Section {
-                    NavigationLink(
-                        destination: WeatherView(
-                            destination: selectedDestination ?? destinations[0],
-                            date: selectedDate
+                    // Date select
+                    Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
+                        DatePicker(
+                            "Selecciona una fecha",
+                            selection: $selectedDate,
+                            in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                            displayedComponents: [.date]
                         )
-                    ) {
-                        Text("Checar clima")
+                        .colorScheme(.dark)
                     }
-                    .disabled(selectedDestination == nil)
-                }
+                    .listRowBackground(Color.blue.opacity(0.3))
 
-                // Sección de actividades
-                Section(
-                    header: Text("Actividades")
-                        .foregroundColor(selectedDestination == nil ? .gray : .primary)
-                ) {
-                    activityListView
+                    // Weather check
+                    Section {
+                        NavigationLink(
+                            destination: WeatherView(
+                                destination: selectedDestination ?? destinations[0],
+                                date: selectedDate
+                            )
+                        ) {
+                            Text("Checar clima")
+                                .foregroundColor(textColor)
+                                .bold()
+                        }
+                        .disabled(selectedDestination == nil)
+                    }
+                    .listRowBackground(Color.blue.opacity(0.4))
+
+                    // Activities
+                    Section(
+                        header: Text("Actividades")
+                            .foregroundColor(selectedDestination == nil ? .gray : textColor)
+                    ) {
+                        activityListView
+                    }
+                    .listRowBackground(Color.blue.opacity(0.4))
                 }
+                .scrollContentBackground(.hidden) // No Form Background
+                .background(Color.clear)
             }
             .navigationTitle("Planificar viaje")
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarBackground(Color.blue.opacity(0.5), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
     }
     
@@ -72,8 +99,11 @@ struct PlanView: View {
                     isSelected: isActivitySelected(activity),
                     onTap: { toggleActivity(activity) }
                 )
+                .listRowBackground(Color.blue.opacity(0.2))
             }
         }
+        .listStyle(.plain)
+        .background(Color.clear)
     }
     
     // Filtrar actividades por destino seleccionado
@@ -121,3 +151,4 @@ struct ActivityRow: View {
         .padding(.vertical, 4)
     }
 }
+
