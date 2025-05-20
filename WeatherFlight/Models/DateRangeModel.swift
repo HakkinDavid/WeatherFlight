@@ -11,12 +11,13 @@ struct DateRange: Identifiable {
     let id: UUID
     let startDate: Date
     let endDate: Date
-    let associate_id: UUID? = nil
+    let associate_id: UUID?
     
-    init(startDate: Date, endDate: Date) {
+    init(startDate: Date, endDate: Date, associate_id: UUID? = nil) {
         self.id = UUID()
         self.startDate = startDate
         self.endDate = endDate
+        self.associate_id = associate_id
     }
     
     func get_associate_id() -> UUID? {
