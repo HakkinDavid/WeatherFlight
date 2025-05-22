@@ -9,12 +9,13 @@ import SwiftUI
 
 @main
 struct WeatherFlightApp: App {
-    @StateObject private var flightManager = FlightManager()
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
         WindowGroup {
-            PermissionsView().environmentObject(flightManager)
+            ContentView()
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(FlightManager(context: persistenceController.container.viewContext))
         }
     }
 }

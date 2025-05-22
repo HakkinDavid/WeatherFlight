@@ -12,8 +12,8 @@ struct Flight: Identifiable, Codable, Hashable {
     let destination: Destination
     let agendaItems: [AgendaItem]
     
-    init(name: String, destination: Destination, agendaItems: [AgendaItem]) {
-        self.id = UUID()
+    init(id: UUID = UUID(), name: String, destination: Destination, agendaItems: [AgendaItem]) {
+        self.id = id
         self.name = name
         self.destination = destination
         self.agendaItems = agendaItems
