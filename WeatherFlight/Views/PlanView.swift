@@ -13,7 +13,8 @@ struct PlanView: View {
     @State private var selectedSeason: String? = "Verano"
     @State private var selectedDate = Date()
     @State private var selectedActivities: [Activity] = []
-    @State private var navigate = false
+    @State private var showActivityPopup = false
+    @State private var showSuccessAlert = false
 
     let activities = sampleActivities
     
@@ -42,29 +43,19 @@ struct PlanView: View {
                         }
                         .colorScheme(.dark) // Para mejor visibilidad del picker
                     }
-                    .listRowBackground(Color.blue.opacity(0.3))
+                    .listRowBackground(Color.white.opacity(0.3))
                     
                     // Sección de fecha
                     Section(header: Text("Temporada de viaje").foregroundColor(textColor).bold()) {
                         Picker("Selecciona una temporada", selection: $selectedSeason) {
-                            Text("Verano")
-                            Text("Invierno")
+                            Text("Verano").tag(Optional("Verano"))
+                            Text("Invierno").tag(Optional("Invierno"))
                         }
-                    }
-                    .listRowBackground(Color.blue.opacity(0.3))
-                    
-                    
-                    // Date select
-                    Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
-                        DatePicker(
-                            "Selecciona una fecha",
-                            selection: $selectedDate,
-                            in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
-                            displayedComponents: [.date]
-                        )
                         .colorScheme(.dark)
                     }
-                    .listRowBackground(Color.blue.opacity(0.3))
+                    .listRowBackground(Color.white.opacity(0.3))
+                    
+                    
                     // Weather check
                     Section {
                         NavigationLink(
@@ -92,6 +83,10 @@ struct PlanView: View {
                         }
                         .disabled(selectedDestination == nil)
                         .listRowBackground(Color.blue.opacity(0.4))
+                        .sheet(isPresented: $showActivityPopup) {}
+                        .alert("Actividad añadida para \(formattedDate(selectedDate))", isPresented: $showSuccessAlert) {
+                            Button("Cerrar", role: .cancel) {}
+                        }
                     }
                     
                 }
@@ -111,15 +106,28 @@ struct PlanView: View {
             ForEach(filteredActivities) { activity in
                 ActivityRow(
                     activity: activity,
-                    isSelected: isActivitySelected(activity),
-                    onTap: { toggleActivity(activity) }
+                    onTap: { toggleSheet() }
                 )
                 .listRowBackground(Color.blue.opacity(0.2))
             }
         }
-        .frame(minHeight: 150)
+        .frame(minHeight: 300)
         .listStyle(.plain)
         .background(Color.clear)
+    }
+    
+    private var calendarSheet: some View {
+        VStack {
+            Text("Selecciona una fecha")
+            
+            
+            
+            Button("Aceptar") {
+                showSuccessAlert = true
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
     }
     
     // Filtrar actividades por destino seleccionado
@@ -130,24 +138,21 @@ struct PlanView: View {
         return activities.filter { $0.destination == destination.name }
     }
     
-    // Verificar si una actividad está seleccionada
-    private func isActivitySelected(_ activity: Activity) -> Bool {
-        selectedActivities.contains(where: { $0.id == activity.id })
+    func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.locale = Locale.autoupdatingCurrent
+        return formatter.string(from: date)
     }
-
-    func toggleActivity(_ activity: Activity) {
-        if isActivitySelected(activity){
-            selectedActivities.removeAll { $0.id == activity.id }
-        } else {
-            selectedActivities.append(activity)
-        }
+    
+    func toggleSheet() {
+        showActivityPopup = true
     }
 }
 
 // Componente separado para la fila de actividad
 struct ActivityRow: View {
     let activity: Activity
-    let isSelected: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -158,10 +163,29 @@ struct ActivityRow: View {
             }
             Spacer()
             Button(action: onTap) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle")
+                Image(systemName: "plus.circle")
                     .foregroundColor(.blue)
             }
         }
         .padding(.vertical, 4)
     }
 }
+
+/*struct CalendarLogic: View {
+    let activity: Activity
+    
+    var body: some View {
+        VStack {
+            Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
+                DatePicker(
+                    "Selecciona una fecha",
+                    selection: $selectedDate,
+                    in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                    displayedComponents: [.date]
+                )
+                .colorScheme(.dark)
+            }
+            .listRowBackground(Color.blue.opacity(0.3))
+        }
+    }
+}*/
