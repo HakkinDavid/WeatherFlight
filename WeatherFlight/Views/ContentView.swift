@@ -4,6 +4,7 @@ import CoreLocation
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var flightManager: FlightManager
+    @Environment(\.colorScheme) var colorScheme
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
@@ -34,7 +35,7 @@ struct ContentView: View {
                     Label("Perfil", systemImage: "person.crop.circle")
                 }
         }
-        .accentColor(.black)
+        .accentColor(colorScheme == .dark ? .white : .black)
     }
 }
 

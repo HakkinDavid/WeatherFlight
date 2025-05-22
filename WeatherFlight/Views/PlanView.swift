@@ -45,12 +45,13 @@ struct PlanView: View {
                     .listRowBackground(Color.blue.opacity(0.3))
                     
                     // Sección de fecha
-                    Section(header: Text("Temporada de viaje")) {
+                    Section(header: Text("Temporada de viaje").foregroundColor(textColor).bold()) {
                         Picker("Selecciona una temporada", selection: $selectedSeason) {
                             Text("Verano")
                             Text("Invierno")
                         }
                     }
+                    .listRowBackground(Color.blue.opacity(0.3))
                     
                     
                     // Date select
@@ -80,16 +81,18 @@ struct PlanView: View {
                     }
                     .listRowBackground(Color.blue.opacity(0.4))
                     
-                    // Sección de actividades
-                    Section(
-                        header: Text("Actividades")
-                            .foregroundColor(selectedDestination == nil ? .gray : .primary)
-                            .font(.title2)
-                    ) {
-                        activityListView
+                    // Activity list
+                    // Does not show if there are no activities
+                    if !filteredActivities.isEmpty {
+                        Section(
+                            header: Text("Actividades").foregroundColor(textColor).bold()
+                                .font(.title2)
+                        ) {
+                            activityListView.frame(minHeight: 150)
+                        }
+                        .disabled(selectedDestination == nil)
+                        .listRowBackground(Color.blue.opacity(0.4))
                     }
-                    .disabled(selectedDestination == nil)
-                    .listRowBackground(Color.blue.opacity(0.4))
                     
                 }
                 .scrollContentBackground(.hidden) // No Form Background
@@ -114,6 +117,7 @@ struct PlanView: View {
                 .listRowBackground(Color.blue.opacity(0.2))
             }
         }
+        .frame(minHeight: 150)
         .listStyle(.plain)
         .background(Color.clear)
     }
