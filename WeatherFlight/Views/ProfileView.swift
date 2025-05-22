@@ -92,7 +92,7 @@ struct ProfileView: View {
             .alert("WeatherFlight", isPresented: $showingAbout) {
                 Button("Cerrar", role: .cancel) {}
             } message: {
-                Text("PLACEHOLDER TEXT")
+                Text("Aplicación hecha por:\nDavid Emmanuel Santana Romero\nMauricio Alcántar Dueñas\nDiego Emilio Casta Valle\n Para la clase de Desarrollo para Plataformas Heterogéneas, 2025.\n\n\n© 2025 WeatherFlight. All rights reserved.")
             }
         }
     }
