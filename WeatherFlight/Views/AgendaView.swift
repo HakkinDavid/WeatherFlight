@@ -9,11 +9,11 @@ import SwiftUI
 import EventKit
 
 struct AgendaView: View {
-    @EnvironmentObject var agendaManager: AgendaManager
+    @EnvironmentObject var flightManager: FlightManager
     @State private var showingExportAlert = false
 
     var groupedItems: [String: [AgendaItem]] {
-        Dictionary(grouping: agendaManager.items) { $0.activity.destination }
+        Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
     }
 
     var body: some View {
@@ -32,7 +32,7 @@ struct AgendaView: View {
                                 VStack(alignment: .leading) {
                                     Text(item.activity.name).font(.headline)
                                     Text(item.activity.description).font(.subheadline)
-                                    Text("📅 \(formattedDate(item.date))").font(.caption)
+                                    Text("📅 \(formattedDate(item.date.startDate))").font(.caption)
                                 }
                             }
                         }
@@ -62,11 +62,11 @@ struct AgendaView: View {
         eventStore.requestAccess(to: .event) { granted, _ in
             guard granted else { return }
 
-            for item in agendaManager.items {
+            for item in flightManager.flights[0].agendaItems {
                 let event = EKEvent(eventStore: eventStore)
                 event.title = item.activity.name
-                event.startDate = Date() // Had to change the date for now
-                event.endDate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())
+                event.startDate = item.date.startDate
+                event.endDate = item.date.startDate
                 event.notes = "\(item.activity.description) en \(item.activity.destination)"
                 event.calendar = eventStore.defaultCalendarForNewEvents
 
