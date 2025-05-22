@@ -13,7 +13,10 @@ struct AgendaView: View {
     @State private var showingExportAlert = false
 
     var groupedItems: [String: [AgendaItem]] {
-        Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
+        if (flightManager.flights.isEmpty) {
+            return [:]
+        }
+        return Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
     }
 
     var body: some View {
@@ -25,19 +28,7 @@ struct AgendaView: View {
                 .ignoresSafeArea()
             
             NavigationView {
-                List {
-                    ForEach(groupedItems.keys.sorted(), id: \.self) { city in
-                        Section(header: Text(city)) {
-                            ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
-                                VStack(alignment: .leading) {
-                                    Text(item.activity.name).font(.headline)
-                                    Text(item.activity.description).font(.subheadline)
-                                    Text("📅 \(formattedDate(item.date.startDate))").font(.caption)
-                                }
-                            }
-                        }
-                    }
-                }
+                AgendaListView(groupedItems: groupedItems, formattedDate: formattedDate)
                 .navigationTitle("Agenda")
                 .toolbar {
                     Button("Exportar 📆") {
@@ -79,6 +70,27 @@ struct AgendaView: View {
 
             DispatchQueue.main.async {
                 showingExportAlert = true
+            }
+        }
+    }
+}
+
+struct AgendaListView: View {
+    let groupedItems: [String: [AgendaItem]]
+    let formattedDate: (Date) -> String
+
+    var body: some View {
+        List {
+            ForEach(groupedItems.keys.sorted(), id: \.self) { city in
+                Section(header: Text(city)) {
+                    ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
+                        VStack(alignment: .leading) {
+                            Text(item.activity.name).font(.headline)
+                            Text(item.activity.description).font(.subheadline)
+                            Text("📅 \(formattedDate(item.date.startDate))").font(.caption)
+                        }
+                    }
+                }
             }
         }
     }

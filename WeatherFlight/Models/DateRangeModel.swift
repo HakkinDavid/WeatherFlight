@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-struct DateRange: Identifiable, Hashable, Codable {
+struct DateRange: Identifiable, Hashable, Codable, Comparable {
+    
     let id: UUID
     let startDate: Date
     let endDate: Date
@@ -28,5 +29,9 @@ struct DateRange: Identifiable, Hashable, Codable {
     
     func get_duration() -> TimeInterval {
         return self.endDate.timeIntervalSince(self.startDate)
+    }
+    
+    static func < (lhs: DateRange, rhs: DateRange) -> Bool {
+        return lhs.startDate < rhs.startDate
     }
 }
