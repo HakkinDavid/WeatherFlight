@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 struct PermissionsView: View {
     @EnvironmentObject var flightManager: FlightManager
@@ -176,5 +177,5 @@ struct PermissionsView: View {
 
 #Preview {
     PermissionsView()
-        .environmentObject(FlightManager())
+        .environmentObject(FlightManager(context: NSManagedObjectContext()))
 }
