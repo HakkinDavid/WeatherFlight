@@ -17,12 +17,6 @@ struct AgendaView: View {
     }
 
     var body: some View {
-        ZStack{
-            
-            Rectangle()
-                .fill(LinearGradient(colors: [.red, .red.opacity(0.8), .red.opacity(0.2), .white], startPoint: .top, endPoint: .bottom))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea()
             
             NavigationView {
                 List {
@@ -49,7 +43,6 @@ struct AgendaView: View {
                 }
             }
         }
-    }
 
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
