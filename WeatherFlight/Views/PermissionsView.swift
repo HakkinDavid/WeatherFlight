@@ -177,5 +177,5 @@ struct PermissionsView: View {
 
 #Preview {
     PermissionsView()
-        .environmentObject(FlightManager(context: NSManagedObjectContext()))
+        .environmentObject(FlightManager(context: PersistenceController().container.viewContext))
 }
