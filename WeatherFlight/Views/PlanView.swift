@@ -10,11 +10,11 @@ import SwiftUI
 struct PlanView: View {
     @EnvironmentObject var flightManager: FlightManager
     @State private var selectedDestination: Destination? = destinations.first
-    @State private var selectedSeason: String? = "Verano"
     @State private var selectedDate = Date()
     @State private var selectedActivities: [Activity] = []
-    @State private var showActivityPopup = false
-    @State private var showSuccessAlert = false
+    @State private var agendaItems: [AgendaItem] = []
+    @State private var showAddAlert = false
+    @State private var showRemoveAlert = false
 
     let activities = sampleActivities
     
@@ -27,7 +27,6 @@ struct PlanView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                
                 beachGradient
                     .edgesIgnoringSafeArea(.all)
                 
@@ -45,16 +44,17 @@ struct PlanView: View {
                     }
                     .listRowBackground(Color.white.opacity(0.3))
                     
-                    // Sección de fecha
-                    Section(header: Text("Temporada de viaje").foregroundColor(textColor).bold()) {
-                        Picker("Selecciona una temporada", selection: $selectedSeason) {
-                            Text("Verano").tag(Optional("Verano"))
-                            Text("Invierno").tag(Optional("Invierno"))
-                        }
+                    // Date select
+                    Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
+                        DatePicker(
+                            "Selecciona una fecha",
+                            selection: $selectedDate,
+                            in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                            displayedComponents: [.date]
+                        )
                         .colorScheme(.dark)
                     }
                     .listRowBackground(Color.white.opacity(0.3))
-                    
                     
                     // Weather check
                     Section {
@@ -64,13 +64,13 @@ struct PlanView: View {
                                 date: selectedDate
                             )
                         ) {
-                            Text("Checar clima")
+                            Text("Revisar clima para la fecha seleccionada")
                                 .foregroundColor(textColor)
                                 .bold()
                         }
                         .disabled(selectedDestination == nil)
                     }
-                    .listRowBackground(Color.blue.opacity(0.4))
+                    .listRowBackground(Color.white.opacity(0.3))
                     
                     // Activity list
                     // Does not show if there are no activities
@@ -79,12 +79,14 @@ struct PlanView: View {
                             header: Text("Actividades").foregroundColor(textColor).bold()
                                 .font(.title2)
                         ) {
-                            activityListView.frame(minHeight: 150)
+                            activityListView
                         }
                         .disabled(selectedDestination == nil)
-                        .listRowBackground(Color.blue.opacity(0.4))
-                        .sheet(isPresented: $showActivityPopup) {}
-                        .alert("Actividad añadida para \(formattedDate(selectedDate))", isPresented: $showSuccessAlert) {
+                        .listRowBackground(Color.white.opacity(0.5))
+                        .alert("Actividad añadida al plan para \(formattedDate(selectedDate))", isPresented: $showAddAlert) {
+                            Button("Cerrar", role: .cancel) {}
+                        }
+                        .alert("Actividad removida del plan", isPresented: $showRemoveAlert) {
                             Button("Cerrar", role: .cancel) {}
                         }
                     }
@@ -95,7 +97,7 @@ struct PlanView: View {
             }
             .navigationTitle("Planificar viaje")
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(Color.blue.opacity(0.5), for: .navigationBar)
+            .toolbarBackground(Color.purple.opacity(0.1), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
         }
     }
@@ -106,28 +108,15 @@ struct PlanView: View {
             ForEach(filteredActivities) { activity in
                 ActivityRow(
                     activity: activity,
-                    onTap: { toggleSheet() }
+                    isSelected: isActivitySelected(activity),
+                    onTap: { toggleActivity(activity) }
                 )
-                .listRowBackground(Color.blue.opacity(0.2))
+                .listRowBackground(Color.clear.opacity(0.2))
             }
         }
         .frame(minHeight: 300)
         .listStyle(.plain)
         .background(Color.clear)
-    }
-    
-    private var calendarSheet: some View {
-        VStack {
-            Text("Selecciona una fecha")
-            
-            
-            
-            Button("Aceptar") {
-                showSuccessAlert = true
-            }
-        }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
     }
     
     // Filtrar actividades por destino seleccionado
@@ -138,6 +127,11 @@ struct PlanView: View {
         return activities.filter { $0.destination == destination.name }
     }
     
+    // Verificar si una actividad está seleccionada
+    private func isActivitySelected(_ activity: Activity) -> Bool {
+        agendaItems.contains(where: { $0.activity.name == activity.name && $0.date.startDate == selectedDate })
+    }
+    
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -145,14 +139,21 @@ struct PlanView: View {
         return formatter.string(from: date)
     }
     
-    func toggleSheet() {
-        showActivityPopup = true
+    func toggleActivity(_ activity: Activity) {
+        if isActivitySelected(activity){
+            agendaItems.removeAll(where: { $0.activity.name == activity.name && $0.date.startDate == selectedDate })
+            showRemoveAlert = true
+        } else {
+            agendaItems.append(AgendaItem(activity: activity, date: DateRange(startDate: selectedDate, endDate: selectedDate)))
+            showAddAlert = true
+        }
     }
 }
 
 // Componente separado para la fila de actividad
 struct ActivityRow: View {
     let activity: Activity
+    let isSelected: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -163,29 +164,11 @@ struct ActivityRow: View {
             }
             Spacer()
             Button(action: onTap) {
-                Image(systemName: "plus.circle")
+                Image(systemName: isSelected ? "checkmark.circle.fill" :  "plus.circle")
                     .foregroundColor(.blue)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 
-/*struct CalendarLogic: View {
-    let activity: Activity
-    
-    var body: some View {
-        VStack {
-            Section(header: Text("Fecha del viaje").foregroundColor(textColor).bold()) {
-                DatePicker(
-                    "Selecciona una fecha",
-                    selection: $selectedDate,
-                    in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
-                    displayedComponents: [.date]
-                )
-                .colorScheme(.dark)
-            }
-            .listRowBackground(Color.blue.opacity(0.3))
-        }
-    }
-}*/
