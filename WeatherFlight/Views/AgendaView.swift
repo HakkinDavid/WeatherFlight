@@ -24,7 +24,7 @@ struct AgendaView: View {
         }
         return Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
     }
-
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -167,4 +167,5 @@ struct AgendaView: View {
     
     func exportToCalendar() {
         // TODO: add this lol    }
+    }
 }
