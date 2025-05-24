@@ -7,84 +7,164 @@
 
 import SwiftUI
 import EventKit
-
 struct AgendaView: View {
     @EnvironmentObject var flightManager: FlightManager
     @State private var showingExportAlert = false
-
+    
+    // Paleta de colores
+    private let backgroundColor = Color(red: 0.98, green: 0.96, blue: 0.92)
+    private let cardColor = Color(red: 0.95, green: 0.92, blue: 0.85)
+    private let accentColor = Color(red: 0.8, green: 0.7, blue: 0.6)
+    private let textColor = Color(red: 0.3, green: 0.25, blue: 0.2)
+    private let shadowColor = Color(red: 0.7, green: 0.65, blue: 0.6).opacity(0.3)
+    
     var groupedItems: [String: [AgendaItem]] {
-        if (flightManager.flights.isEmpty) {
+        if flightManager.flights.isEmpty {
             return [:]
         }
         return Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
     }
 
     var body: some View {
-            
-            NavigationView {
-                AgendaListView(groupedItems: groupedItems, formattedDate: formattedDate)
-                .navigationTitle("Agenda")
-                .toolbar {
-                    Button("Exportar 📆") {
-                        exportToCalendar()
+        NavigationView {
+            ZStack {
+                backgroundColor
+                    .edgesIgnoringSafeArea(.all)
+                
+                Image(systemName: "leaf.fill")
+                    .foregroundColor(accentColor.opacity(0.05))
+                    .font(.system(size: 100))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .offset(x: 30, y: 30)
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        if groupedItems.isEmpty {
+                            emptyStateView
+                        } else {
+                            ForEach(groupedItems.keys.sorted(), id: \.self) { city in
+                                citySection(city: city)
+                            }
+                        }
                     }
-                }
-                .alert("Exportado a Calendario", isPresented: $showingExportAlert) {
-                    Button("OK", role: .cancel) { }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 30)
                 }
             }
+            .navigationTitle("Bitácora de Viaje")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: exportToCalendar) {
+                        HStack {
+                            Image(systemName: "calendar.badge.plus")
+                            Text("Exportar")
+                        }
+                        .font(.subheadline)
+                        .padding(8)
+                        .background(accentColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            .alert("Exportado a Calendario", isPresented: $showingExportAlert) {
+                Button("OK", role: .cancel) { }
+            }
         }
-
+    }
+    
+    private var emptyStateView: some View {
+        VStack {
+            Image(systemName: "book.closed.fill")
+                .font(.system(size: 50))
+                .foregroundColor(accentColor)
+                .padding(.bottom, 20)
+            
+            Text("Tu bitácora está vacía")
+                .font(.title2)
+                .fontWeight(.medium)
+                .foregroundColor(textColor)
+            
+            Text("Agrega actividades para comenzar a llenar tu diario de viaje")
+                .font(.subheadline)
+                .foregroundColor(textColor.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+                .padding(.top, 5)
+        }
+        .padding(40)
+        .frame(maxWidth: .infinity)
+        .background(cardColor)
+        .cornerRadius(15)
+        .shadow(color: shadowColor, radius: 10, x: 0, y: 5)
+    }
+    
+    private func citySection(city: String) -> some View {
+        VStack(alignment: .leading, spacing: 15) {
+            HStack {
+                Image(systemName: "mappin.and.ellipse")
+                    .foregroundColor(accentColor)
+                Text(city)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundColor(textColor)
+            }
+            .padding(.horizontal, 15)
+            .padding(.top, 15)
+            
+            ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
+                activityCard(item: item)
+            }
+        }
+        .background(cardColor)
+        .cornerRadius(15)
+        .shadow(color: shadowColor, radius: 5, x: 0, y: 3)
+    }
+    
+    private func activityCard(item: AgendaItem) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Circle()
+                    .fill(accentColor)
+                    .frame(width: 10, height: 10)
+                
+                Text(item.activity.name)
+                    .font(.headline)
+                    .foregroundColor(textColor)
+                    .padding(.leading, 5)
+            }
+            
+            Text(item.activity.description)
+                .font(.subheadline)
+                .foregroundColor(textColor.opacity(0.8))
+                .padding(.leading, 15)
+            
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundColor(accentColor)
+                Text(formattedDate(item.date.startDate))
+                    .font(.caption)
+                    .foregroundColor(textColor.opacity(0.7))
+            }
+            .padding(.leading, 15)
+            .padding(.top, 5)
+        }
+        .padding(15)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.3))
+        .cornerRadius(10)
+        .padding(.horizontal, 15)
+        .padding(.bottom, 15)
+    }
+    
     func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .full
+        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "es_ES")
         return formatter.string(from: date)
     }
-
+    
     func exportToCalendar() {
-        let eventStore = EKEventStore()
-        eventStore.requestAccess(to: .event) { granted, _ in
-            guard granted else { return }
-
-            for item in flightManager.flights[0].agendaItems {
-                let event = EKEvent(eventStore: eventStore)
-                event.title = item.activity.name
-                event.startDate = item.date.startDate
-                event.endDate = item.date.startDate
-                event.notes = "\(item.activity.description) en \(item.activity.destination)"
-                event.calendar = eventStore.defaultCalendarForNewEvents
-
-                do {
-                    try eventStore.save(event, span: .thisEvent)
-                } catch {
-                    print("Error al guardar evento: \(error)")
-                }
-            }
-
-            DispatchQueue.main.async {
-                showingExportAlert = true
-            }
-        }
-    }
-}
-
-struct AgendaListView: View {
-    let groupedItems: [String: [AgendaItem]]
-    let formattedDate: (Date) -> String
-
-    var body: some View {
-        List {
-            ForEach(groupedItems.keys.sorted(), id: \.self) { city in
-                Section(header: Text(city)) {
-                    ForEach(groupedItems[city]!.sorted(by: { $0.date < $1.date })) { item in
-                        VStack(alignment: .leading) {
-                            Text(item.activity.name).font(.headline)
-                            Text(item.activity.description).font(.subheadline)
-                            Text("📅 \(formattedDate(item.date.startDate))").font(.caption)
-                        }
-                    }
-                }
-            }
-        }
-    }
+        // TODO: add this lol    }
 }

@@ -41,7 +41,7 @@ class FlightManager: ObservableObject {
                 let destination = destinations.first(where: { $0.name == entity.destination_name })
                 let decodedItems = try? JSONDecoder().decode([AgendaItem].self, from: entity.agenda_items ?? Data())
 
-                return Flight(id: entity.id ?? UUID(), name: entity.name ?? "", destination: destination ?? destinations[0], agendaItems: decodedItems ?? [])
+                return Flight(name: entity.name ?? "", destination: destination ?? destinations[0], agendaItems: decodedItems ?? [])
             }
         } catch {
             print("Error loading flights: \(error)")
