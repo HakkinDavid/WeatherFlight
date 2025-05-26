@@ -47,6 +47,7 @@ let sampleActivities = [
     Activity(name: "Caminata al amanecer", description: "Siente el aire frío del mar antes de que despierte el mundo.", category: "Al aire libre", destination: "Salsipuedes", recommendedFor: ["soleado"]),
     Activity(name: "Charlas con pescadores locales", description: "Aprende de la sabiduría marinera de generaciones.", category: "Cultural", destination: "Salsipuedes", recommendedFor: ["nublado"]),
     Activity(name: "Lectura solitaria entre rocas", description: "Un refugio para perderse en letras junto al mar.", category: "Relax", destination: "Salsipuedes", recommendedFor: ["soleado", "nublado"]),
+    Activity(name: "Salir", description: "Solo si puedes.", category: "Riesgo", destination: "Salsipuedes"),
 
     // NACO (Sonora, México)
     Activity(name: "Ruta del ferrocarril", description: "Explora ruinas de estaciones y vías abandonadas.", category: "Histórica", destination: "Naco", recommendedFor: ["nublado"]),
