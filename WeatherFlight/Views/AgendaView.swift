@@ -57,8 +57,9 @@ struct AgendaView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Picker("Selecciona un viaje", selection: $selectedFlight) {
-                        ForEach(flightManager.flights.count, id: \.self) { flightIdx in
-                            Text(flightManager.flights[flightIdx].name)
+                        ForEach(Array(0..<flightManager.flights.count), id: \.self) { flightIdx in
+                            let flightName = flightManager.flights[flightIdx].name
+                            Text(flightName)
                                 .foregroundColor(.white)
                         }
                     }
