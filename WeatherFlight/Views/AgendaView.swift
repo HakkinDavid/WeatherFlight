@@ -21,7 +21,7 @@ struct AgendaView: View {
     @State private var selectedFlight = 0
     
     var groupedItems: [String: [AgendaItem]] {
-        if flightManager.flights[selectedFlight].agendaItems.isEmpty {
+        if flightManager.flights.isEmpty || flightManager.flights[selectedFlight].agendaItems.isEmpty {
             return [:]
         }
         return Dictionary(grouping: flightManager.flights[selectedFlight].agendaItems) { $0.activity.destination }
@@ -29,41 +29,58 @@ struct AgendaView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                backgroundColor
-                    .edgesIgnoringSafeArea(.all)
-                
-                Image(systemName: "leaf.fill")
-                    .foregroundColor(accentColor.opacity(0.05))
-                    .font(.system(size: 100))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                    .offset(x: 30, y: 30)
-                
-                ScrollView {
-                    VStack(spacing: 20) {
-                        if groupedItems.isEmpty {
-                            emptyStateView
-                        } else {
-                            ForEach(groupedItems.keys.sorted(), id: \.self) { city in
-                                citySection(city: city)
+            VStack{
+                Picker("Selecciona un viaje", selection: $selectedFlight) {
+                    ForEach(Array(0..<flightManager.flights.count), id: \.self) { flightIdx in
+                        let flightName = flightManager.flights[flightIdx].name
+                        Text(flightName)
+                            .foregroundColor(.white)
+                    }
+                }
+                .colorScheme(.dark)
+                .disabled(flightManager.flights.isEmpty)
+                .previewDisplayName(flightManager.flights.isEmpty ? "No hay vuelos agendados" : "")
+                .listRowBackground(Color.gray.opacity(0.3))
+                ZStack {
+                    backgroundColor
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    Image(systemName: "leaf.fill")
+                        .foregroundColor(accentColor.opacity(0.05))
+                        .font(.system(size: 100))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                        .offset(x: 30, y: 30)
+                    
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            if groupedItems.isEmpty {
+                                emptyStateView
+                            } else {
+                                ForEach(groupedItems.keys.sorted(), id: \.self) { city in
+                                    citySection(city: city)
+                                }
                             }
                         }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 30)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 30)
                 }
             }
             .navigationTitle("Bitácora de Viaje")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Picker("Selecciona un viaje", selection: $selectedFlight) {
-                        ForEach(Array(0..<flightManager.flights.count), id: \.self) { flightIdx in
-                            let flightName = flightManager.flights[flightIdx].name
-                            Text(flightName)
-                                .foregroundColor(.white)
+                    Button(action: {deleteItem(at: $selectedFlight.wrappedValue)}) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Eliminar")
                         }
+                        .font(.subheadline)
+                        .padding(8)
+                        .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : .red)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                     }
-                    .colorScheme(.dark)
+                    .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: exportToCalendar) {
@@ -73,10 +90,11 @@ struct AgendaView: View {
                         }
                         .font(.subheadline)
                         .padding(8)
-                        .background(accentColor)
+                        .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : accentColor)
                         .foregroundColor(.white)
                         .cornerRadius(8)
                     }
+                    .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
                 }
             }
             .alert("Exportado a Calendario", isPresented: $showingExportAlert) {
@@ -97,7 +115,7 @@ struct AgendaView: View {
                 .fontWeight(.medium)
                 .foregroundColor(textColor)
             
-            Text("Agrega actividades para comenzar a llenar tu diario de viaje")
+            Text("Agrega viajes para comenzar a llenar tu bitácora")
                 .font(.subheadline)
                 .foregroundColor(textColor.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -175,6 +193,11 @@ struct AgendaView: View {
         formatter.timeStyle = .short
         formatter.locale = Locale(identifier: "es_ES")
         return formatter.string(from: date)
+    }
+    
+    func deleteItem(at index: Int) {
+        $selectedFlight.wrappedValue = 0
+        flightManager.remove(at: index)
     }
     
     func exportToCalendar() {

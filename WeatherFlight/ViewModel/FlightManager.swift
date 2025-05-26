@@ -24,12 +24,20 @@ class FlightManager: ObservableObject {
         saveFlightToCoreData(newFlight)
     }
 
-    func remove(_ flight: Flight) {
+    func remove(at index: Int) {
+        guard index < flights.count else { return }
+
+        let flight = flights[index]
+
         if let entity = fetchFlightEntity(by: flight.id) {
+            print("Entidad borrada con id: \(entity.id)")
             context.delete(entity)
             saveContext()
+        } else {
+            print("No se encontró la entidad en Core Data con id: \(flight.id)")
         }
-        flights.removeAll { $0.id == flight.id }
+
+        flights.remove(at: index)
     }
 
     private func loadFlights() {
@@ -41,7 +49,7 @@ class FlightManager: ObservableObject {
                 let destination = destinations.first(where: { $0.name == entity.destination_name })
                 let decodedItems = try? JSONDecoder().decode([AgendaItem].self, from: entity.agenda_items ?? Data())
 
-                return Flight(name: entity.name ?? "", destination: destination ?? destinations[0], agendaItems: decodedItems ?? [])
+                return Flight(id: entity.id!, name: entity.name ?? "", destination: destination ?? destinations[0], agendaItems: decodedItems ?? [])
             }
         } catch {
             print("Error loading flights: \(error)")
@@ -54,6 +62,8 @@ class FlightManager: ObservableObject {
         entity.name = flight.name
         entity.destination_name = flight.destination.name
         entity.agenda_items = (try? JSONEncoder().encode(flight.agendaItems)) ?? Data()
+        
+        print("Guardando FlightEntity con id: \(flight.id) en Core Data como \(entity.id)")
 
         saveContext()
     }
