@@ -12,11 +12,13 @@ import CoreLocation
 import AVFoundation
 import EventKit
 
-class PermissionsViewModel: ObservableObject {
+class PermissionsViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var cameraGranted = false
     @Published var photoLibraryGranted = false
     @Published var locationGranted = false
     @Published var calendarGranted = false
+    
+    private let locationManager = CLLocationManager()
     
     var areAllPermissionsGranted: Bool {
         return locationGranted && calendarGranted
@@ -44,10 +46,12 @@ class PermissionsViewModel: ObservableObject {
         }
     }
     func requestLocationAccess() {
-        let locationManager = CLLocationManager()
+        locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         DispatchQueue.main.async {
-            let status = locationManager.authorizationStatus
             self.locationGranted = (status == .authorizedWhenInUse || status == .authorizedAlways)
         }
     }

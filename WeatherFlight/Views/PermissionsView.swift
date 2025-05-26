@@ -57,7 +57,7 @@ struct PermissionsView: View {
                     VStack(spacing: 30) {
                         Spacer().frame(height: 50)
                         
-                        Text("Weather Flight")
+                        Text("WeatherFlight")
                             .font(.system(size: getSize() * 1.8, weight: .bold))
                             .foregroundColor(textColor)
                             .padding(.vertical, 10)
