@@ -29,27 +29,28 @@ struct AgendaView: View {
     
     var body: some View {
         NavigationView {
-            VStack{
-                Picker("Selecciona un viaje", selection: $selectedFlight) {
-                    ForEach(Array(0..<flightManager.flights.count), id: \.self) { flightIdx in
-                        let flightName = flightManager.flights[flightIdx].name
-                        Text(flightName)
-                            .foregroundColor(.white)
-                    }
-                }
-                .colorScheme(.dark)
-                .disabled(flightManager.flights.isEmpty)
-                .previewDisplayName(flightManager.flights.isEmpty ? "No hay vuelos agendados" : "")
-                .listRowBackground(Color.gray.opacity(0.3))
-                ZStack {
+            ZStack {
                     backgroundColor
                         .edgesIgnoringSafeArea(.all)
-                    
-                    Image(systemName: "leaf.fill")
-                        .foregroundColor(accentColor.opacity(0.05))
-                        .font(.system(size: 100))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                        .offset(x: 30, y: 30)
+                Image(systemName: "leaf.fill")
+                    .foregroundColor(accentColor.opacity(0.05))
+                    .font(.system(size: 100))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .offset(x: 30, y: 30)
+                VStack {
+                    if !flightManager.flights.isEmpty {
+                        Picker("Selecciona un viaje", selection: $selectedFlight) {
+                            ForEach(Array(0..<flightManager.flights.count), id: \.self) { flightIdx in
+                                let flightName = flightManager.flights[flightIdx].name
+                                Text(flightName)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .colorScheme(.dark)
+                        .disabled(flightManager.flights.isEmpty)
+                        .previewDisplayName(flightManager.flights.isEmpty ? "No hay vuelos agendados" : "")
+                        .listRowBackground(Color.gray.opacity(0.3))
+                    }
                     
                     ScrollView {
                         VStack(spacing: 20) {
@@ -68,33 +69,35 @@ struct AgendaView: View {
             }
             .navigationTitle("Bitácora de Viaje")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {deleteItem(at: $selectedFlight.wrappedValue)}) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("Eliminar")
+                if !flightManager.flights.isEmpty {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {deleteItem(at: $selectedFlight.wrappedValue)}) {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Eliminar")
+                            }
+                            .font(.subheadline)
+                            .padding(8)
+                            .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : .red.opacity(0.8))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
                         }
-                        .font(.subheadline)
-                        .padding(8)
-                        .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : .red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
                     }
-                    .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: exportToCalendar) {
-                        HStack {
-                            Image(systemName: "calendar.badge.plus")
-                            Text("Exportar")
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: exportToCalendar) {
+                            HStack {
+                                Image(systemName: "calendar.badge.plus")
+                                Text("Exportar")
+                            }
+                            .font(.subheadline)
+                            .padding(8)
+                            .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : accentColor)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
                         }
-                        .font(.subheadline)
-                        .padding(8)
-                        .background($selectedFlight.wrappedValue >= flightManager.flights.count ? .gray : accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                        .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
                     }
-                    .disabled($selectedFlight.wrappedValue >= flightManager.flights.count)
                 }
             }
             .alert("Exportado a Calendario", isPresented: $showingExportAlert) {

@@ -38,11 +38,9 @@ struct PlanView: View {
                         Picker("Selecciona una ciudad", selection: $selectedDestination) {
                             ForEach(destinations) { destination in
                                 Text(destination.name + ", " + destination.location)
-                                    .tag(Optional(destination))
-                                    .foregroundColor(.white)
+                                    .tag(destination)
                             }
                         }
-                        .colorScheme(.dark) // Para mejor visibilidad del picker
                     }
                     .listRowBackground(Color.white.opacity(0.3))
                     
@@ -94,16 +92,28 @@ struct PlanView: View {
                     }
                     
                     if !agendaItems.isEmpty {
+                        Section (header: Text("Plan actual").foregroundColor(textColor).bold().font(.title2)) {
+                            agendaItemsListView
+                        }
+                        .listRowBackground(Color.white.opacity(0.5))
                         Section(header: Text("Guardar viaje").foregroundColor(textColor).bold().font(.title2)) {
-                            TextField("Nombre del viaje", text: $tripName)
-                            Button("Guardar", action: {
-                                saveFlight()
-                            })
-                            .disabled(tripName.isEmpty)
-                            .alert("Viaje guardado", isPresented: $showSaveAlert) {
-                                Button("Cerrar", role: .cancel) {}
+                            VStack {
+                                TextField("Nombre del viaje", text: $tripName) {}
+                                Button("Guardar", action: {
+                                    saveFlight()
+                                })
+                                .disabled(tripName.isEmpty)
+                                .font(.subheadline)
+                                .padding(8)
+                                .background(.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                                .alert("Viaje guardado", isPresented: $showSaveAlert) {
+                                    Button("Aceptar", role: .cancel, action: { resetPlan() })
+                                }
                             }
                         }
+                        .listRowBackground(Color.white.opacity(0.5))
                     }
                     
                 }
@@ -134,6 +144,21 @@ struct PlanView: View {
         .background(Color.clear)
     }
     
+    private var agendaItemsListView: some View {
+        List {
+            ForEach(agendaItems.sorted(by: {$0.date < $1.date}), id: \.id) { agendaItem in
+                AgendaItemRow(
+                    agendaItem: agendaItem,
+                    onTap: { agendaItems.removeAll(where: {$0.id == agendaItem.id}) }
+                )
+                .listRowBackground(Color.clear.opacity(0.2))
+            }
+        }
+        .frame(minHeight: 300)
+        .listStyle(.plain)
+        .background(Color.clear)
+    }
+    
     // Filtrar actividades por destino seleccionado
     private var filteredActivities: [Activity] {
         guard let destination = selectedDestination else {
@@ -144,14 +169,7 @@ struct PlanView: View {
     
     // Verificar si una actividad está seleccionada
     private func isActivitySelected(_ activity: Activity) -> Bool {
-        agendaItems.contains(where: { $0.activity.name == activity.name && $0.date.startDate == selectedDate })
-    }
-    
-    func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.locale = Locale.autoupdatingCurrent
-        return formatter.string(from: date)
+        agendaItems.contains(where: { $0.activity.name == activity.name && ($0.date.startDate == selectedDate || $0.date.endDate == selectedDate) })
     }
     
     func toggleActivity(_ activity: Activity) {
@@ -166,6 +184,15 @@ struct PlanView: View {
     
     func saveFlight() {
         flightManager.add(name: tripName.isEmpty ? "Viaje a \(selectedDestination?.name ?? "") - \(formattedDate(selectedDate))" : tripName, to: selectedDestination!, items: agendaItems)
+        showSaveAlert = true
+    }
+    
+    func resetPlan() {
+        agendaItems.removeAll(keepingCapacity: false)
+        selectedDestination = destinations.first
+        selectedDate = Date()
+        selectedActivities.removeAll(keepingCapacity: false)
+        tripName = ""
     }
 }
 
@@ -191,3 +218,29 @@ struct ActivityRow: View {
     }
 }
 
+struct AgendaItemRow: View {
+    let agendaItem: AgendaItem
+    let onTap: () -> Void
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(agendaItem.activity.name).font(.headline)
+                Text(formattedDate(agendaItem.date.startDate)).font(.subheadline)
+            }
+            Spacer()
+            Button(action: onTap) {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+            }
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+func formattedDate(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    formatter.locale = Locale.autoupdatingCurrent
+    return formatter.string(from: date)
+}
