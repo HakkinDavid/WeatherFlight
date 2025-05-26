@@ -20,11 +20,6 @@ struct WeatherView: View {
     // Servicio de predicción
     private let predictionService = WeatherPredictionService()
     
-    enum DataSource {
-        case api
-        case mlModel
-    }
-    
     var body: some View {
         ZStack {
             // Fondo basado en la temporada
@@ -64,7 +59,7 @@ struct WeatherView: View {
                             sourceLabel
                                 .font(.caption)
                                 .padding(6)
-                                .background(Color.black.opacity(0.1))
+                                .background(Color.black.opacity(0.9))
                                 .cornerRadius(5)
                         }
                         
@@ -179,124 +174,18 @@ struct WeatherView: View {
         return formatter.string(from: date)
     }
     
-    func isDateWithinForecastRange(_ date: Date) -> Bool {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let futureDate = calendar.date(byAdding: .day, value: 15, to: today)!
-        
-        let targetDate = calendar.startOfDay(for: date)
-        return targetDate >= today && targetDate <= futureDate
-    }
-
     func fetchWeatherData() {
         isLoading = true
         
-        // Determinar la fuente de datos basada en la fecha
-        if isDateWithinForecastRange(date) {
-            dataSource = .api
-            fetchWeatherFromApi()
-        } else {
-            dataSource = .mlModel
-            fetchWeatherFromModel()
-        }
-    }
-    
-    func fetchWeatherFromApi() {
-        let lat = destination.latitude
-        let lon = destination.longitude
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let formattedDate = formatter.string(from: date)
+        dataSource = WeatherPredictionService.isDateWithinForecastRange(date) ? .api : .mlModel
         
-        let urlStr = """
-        https://api.open-meteo.com/v1/forecast?latitude=\(lat)&longitude=\(lon)&start_date=\(formattedDate)&end_date=\(formattedDate)&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,relative_humidity_2m_mean&current=temperature_2m&timezone=auto
-        """
-        
-        guard let url = URL(string: urlStr) else {
-            self.errorMessage = "URL inválida"
-            self.isLoading = false
-            return
-        }
-
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            DispatchQueue.main.async {
-                isLoading = false
-                
-                if let error = error {
-                    self.errorMessage = error.localizedDescription
-                    return
-                }
-
-                guard let data = data else {
-                    self.errorMessage = "No se recibieron datos"
-                    return
-                }
-
-                do {
-                    var result = try JSONDecoder().decode(WeatherData.self, from: data)
-                    
-                    // Determinar la temporada basada en la fecha
-                    result.season = determineSeason(from: date)
-                    self.weather = result
-                } catch {
-                    print("Error de decodificación: \(error)")
-                    self.errorMessage = "Error al decodificar datos: \(error.localizedDescription)"
-                }
+        predictionService.fetchWeatherData(for: destination, date: date) { data, error in
+            if let error = error {
+                self.errorMessage = error
+            } else {
+                self.weather = data
             }
-        }.resume()
-    }
-    
-    func fetchWeatherFromModel() {
-        // Usar el modelo de CoreML para predicción
-        if let prediction = predictionService.predict(for: destination.name, date: date) {
-            // Crear un objeto WeatherData a partir de la predicción del modelo
-            let daily = WeatherData.Daily(
-                temperature_2m_max: [prediction.temperature], // Usar el valor único como máximo
-                temperature_2m_min: [], // No hay mínimo en el modelo
-                precipitation_sum: [prediction.precipitation],
-                windspeed_10m_max: [prediction.wind],
-                relative_humidity_2m_mean: [prediction.humidity],
-                time: [formattedDateString(date)]
-            )
-            
-            let current = WeatherData.Current(temperature_2m: -273.15)
-            
-            let weatherData = WeatherData(
-                daily: daily,
-                current: current,
-                season: determineSeason(from: date)
-            )
-            
-            self.weather = weatherData
             self.isLoading = false
-        } else {
-            self.errorMessage = "No se pudo generar la predicción del clima"
-            self.isLoading = false
-        }
-    }
-    
-    func formattedDateString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
-    }
-    
-    func determineSeason(from date: Date) -> String {
-        let calendar = Calendar.current
-        let day = calendar.component(.day, from: date)
-        let month = calendar.component(.month, from: date)
-        
-        switch month {
-        case 12, 1, 2:
-            return "invierno"
-        case 3, 4, 5:
-            return "primavera"
-        case 6, 7, 8:
-            return "verano"
-        case 9, 10, 11:
-            return "otoño"
-        default:
-            return "desconocida"
         }
     }
 }
