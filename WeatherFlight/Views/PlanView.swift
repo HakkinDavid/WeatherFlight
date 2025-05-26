@@ -10,13 +10,14 @@ import SwiftUI
 struct PlanView: View {
     @EnvironmentObject var flightManager: FlightManager
     @State private var selectedDestination: Destination? = destinations.first
-    @State private var selectedDate = Date()
     @State private var selectedActivities: [Activity] = []
     @State private var agendaItems: [AgendaItem] = []
     @State private var showAddAlert = false
     @State private var showRemoveAlert = false
     @State private var showSaveAlert = false
     @State private var tripName: String = ""
+    @State private var date: Date = Calendar.current.startOfDay(for: Date())
+    @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
 
     let activities = sampleActivities
     
@@ -49,7 +50,7 @@ struct PlanView: View {
                         DatePicker(
                             "Selecciona una fecha",
                             selection: $selectedDate,
-                            in: Date()...Calendar.current.date(byAdding: .year, value: 1, to: Date())!,
+                            in: date...Calendar.current.date(byAdding: .year, value: 1, to: date)!,
                             displayedComponents: [.date]
                         )
                         .colorScheme(.dark)
