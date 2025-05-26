@@ -218,7 +218,6 @@ struct PlanView: View {
     }
     
     private func updateWeatherAdjective() {
-        print("Actualizando adjetivo...")
         guard let destination = selectedDestination else {
             weatherAdjective = nil
             return

@@ -45,14 +45,6 @@ struct ProfileView: View {
                         // PROFILE BUTTONS
                         VStack(spacing: 16) {
                             ProfileButton(
-                                icon: "calendar",
-                                text: "Exportar Agenda a Calendario",
-                                color: colorScheme == .dark ? .blue : .brown
-                            ) {
-                                showingExport = true
-                            }
-                            
-                            ProfileButton(
                                 icon: "info.circle",
                                 text: "Acerca de WeatherFlight",
                                 color: colorScheme == .dark ? .blue : .brown
@@ -83,10 +75,6 @@ struct ProfileView: View {
             }
             .navigationTitle("Perfil")
             .navigationBarTitleDisplayMode(.inline)
-            
-            .sheet(isPresented: $showingExport) {
-                // TODO: Puede navegar a una vista con resumen de exportación
-            }
             
             // ABOUT BUTTON
             .alert("WeatherFlight", isPresented: $showingAbout) {

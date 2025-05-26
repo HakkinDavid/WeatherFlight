@@ -416,8 +416,8 @@
 				INFOPLIST_FILE = WeatherFlight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Para guardar tu agenda";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Por favor, accede.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria para proporcionar la mejor experiencia.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Es necesaria para proporcionar la mejor experiencia.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -449,8 +449,8 @@
 				INFOPLIST_FILE = WeatherFlight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Para guardar tu agenda";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Por favor, accede.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria para proporcionar la mejor experiencia.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Es necesaria para proporcionar la mejor experiencia.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

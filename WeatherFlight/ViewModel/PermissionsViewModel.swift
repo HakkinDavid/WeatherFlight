@@ -10,14 +10,16 @@ import Foundation
 import Photos
 import CoreLocation
 import AVFoundation
+import EventKit
 
 class PermissionsViewModel: ObservableObject {
     @Published var cameraGranted = false
     @Published var photoLibraryGranted = false
     @Published var locationGranted = false
+    @Published var calendarGranted = false
     
     var areAllPermissionsGranted: Bool {
-        return locationGranted
+        return locationGranted && calendarGranted
     }
     
     func requestCameraAccess() {
@@ -47,6 +49,15 @@ class PermissionsViewModel: ObservableObject {
         DispatchQueue.main.async {
             let status = locationManager.authorizationStatus
             self.locationGranted = (status == .authorizedWhenInUse || status == .authorizedAlways)
+        }
+    }
+    
+    func requestCalendarAccess() {
+        let eventStore = EKEventStore()
+        eventStore.requestAccess(to: .event) { granted, error in
+            DispatchQueue.main.async {
+                self.calendarGranted = granted && error == nil
+            }
         }
     }
 }

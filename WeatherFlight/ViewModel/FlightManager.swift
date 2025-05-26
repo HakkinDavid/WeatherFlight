@@ -30,7 +30,6 @@ class FlightManager: ObservableObject {
         let flight = flights[index]
 
         if let entity = fetchFlightEntity(by: flight.id) {
-            print("Entidad borrada con id: \(entity.id)")
             context.delete(entity)
             saveContext()
         } else {
@@ -62,8 +61,6 @@ class FlightManager: ObservableObject {
         entity.name = flight.name
         entity.destination_name = flight.destination.name
         entity.agenda_items = (try? JSONEncoder().encode(flight.agendaItems)) ?? Data()
-        
-        print("Guardando FlightEntity con id: \(flight.id) en Core Data como \(entity.id)")
 
         saveContext()
     }

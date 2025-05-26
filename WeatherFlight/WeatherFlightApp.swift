@@ -13,7 +13,7 @@ struct WeatherFlightApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PermissionsView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(FlightManager(context: persistenceController.container.viewContext))
         }
