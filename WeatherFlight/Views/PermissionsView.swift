@@ -8,42 +8,38 @@ struct PermissionsView: View {
     @Environment(\.sizeCategory) var sizeCategory
     @AppStorage("permissionsGranted") private var permissionsGranted: Bool = false
     
-    // Background animation
-    @State private var currentTimeOfDay: TimeOfDay = .morning
-    @State private var gradientColors: [Color] = TimeOfDay.morning.colors
-    
-    private let backgroundColor = Color(red: 0.98, green: 0.96, blue: 0.92)
-    private let cardColor = Color(red: 0.95, green: 0.92, blue: 0.85)
-    private let accentColor = Color(red: 0.8, green: 0.7, blue: 0.6)
-    private let textColor = Color(red: 0.3, green: 0.25, blue: 0.2)
-    private let shadowColor = Color(red: 0.7, green: 0.65, blue: 0.6).opacity(0.3)
-    
-    enum TimeOfDay: CaseIterable {
-        case morning, afternoon, night
-        
-        var colors: [Color] {
-            switch self {
-            case .morning:
-                return [Color(red: 0.95, green: 0.85, blue: 0.7),
-                        Color(red: 0.8, green: 0.9, blue: 1.0)]
-            case .afternoon:
-                return [Color(red: 0.98, green: 0.7, blue: 0.4),
-                        Color(red: 0.98, green: 0.6, blue: 0.25),
-                        Color(red: 0.4, green: 0.6, blue: 0.9)]
-            case .night:
-                return [Color(red: 0.1, green: 0.1, blue: 0.3),
-                        Color(red: 0.3, green: 0.3, blue: 0.6)]
-            }
+    private var backgroundColor: Color {
+            isDaytime
+            ? Color(red: 0.98, green: 0.96, blue: 0.92)         // día, claro
+            : Color(red: 0.05, green: 0.05, blue: 0.2)           // noche, oscuro
         }
         
-        var duration: Double {
-            switch self {
-            case .morning: return 8.0
-            case .afternoon: return 6.0
-            case .night: return 10.0
-            }
+        private var cardColor: Color {
+            isDaytime
+            ? Color(red: 0.95, green: 0.92, blue: 0.85)
+            : Color(red: 0.15, green: 0.15, blue: 0.35)
         }
-    }
+        
+        private var accentColor: Color {
+            isDaytime
+            ? Color(red: 0.8, green: 0.7, blue: 0.6)
+            : Color(red: 0.6, green: 0.5, blue: 0.7)
+        }
+        
+        private var textColor: Color {
+            isDaytime
+            ? Color(red: 0.3, green: 0.25, blue: 0.2)
+            : Color(red: 0.8, green: 0.8, blue: 0.9)
+        }
+        
+        private var shadowColor: Color {
+            (isDaytime
+            ? Color(red: 0.7, green: 0.65, blue: 0.6)
+            : Color(red: 0.1, green: 0.1, blue: 0.3))
+            .opacity(0.3)
+        }
+    
+    
     
     var body: some View {
         if permissionsGranted {
@@ -176,31 +172,11 @@ struct PermissionsView: View {
                     }
                 }
             }
-            .onAppear {
-                startTimeOfDayCycle()
-            }
             .onChange(of: permissionsViewModel.areAllPermissionsGranted) { newValue in
                 if newValue {
                     permissionsGranted = true
                 }
             }
-        }
-    }
-    
-    // Switch between "Times Of Day"
-    private func startTimeOfDayCycle() {
-        let allTimes = TimeOfDay.allCases
-        guard let currentIndex = allTimes.firstIndex(of: currentTimeOfDay) else { return }
-        
-        let nextIndex = (currentIndex + 1) % allTimes.count
-        let nextTime = allTimes[nextIndex]
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + currentTimeOfDay.duration) {
-            withAnimation {
-                self.currentTimeOfDay = nextTime
-                self.gradientColors = nextTime.colors
-            }
-            self.startTimeOfDayCycle()
         }
     }
     
