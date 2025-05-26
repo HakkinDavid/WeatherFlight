@@ -57,6 +57,12 @@ struct PermissionsView: View {
                     VStack(spacing: 30) {
                         Spacer().frame(height: 50)
                         
+                        Image(uiImage: UIImage(named: isDaytime ? "light.png" : "dark.png") ?? UIImage())
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .shadow(color: shadowColor, radius: 10, x: 0, y: 5)
+                        
                         Text("WeatherFlight")
                             .font(.system(size: getSize() * 1.8, weight: .bold))
                             .foregroundColor(textColor)
@@ -208,6 +214,23 @@ struct PermissionsView: View {
         case .extraExtraExtraLarge: return 30
         default: return 18
         }
+    }
+    
+    var isDaytime: Bool {
+        let now = Date()
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: now)
+        let minute = calendar.component(.minute, from: now)
+
+        // Día: desde 6:00 hasta 20:30
+        if hour < 6 {
+            return false
+        } else if hour == 20 && minute >= 30 {
+            return false
+        } else if hour > 20 {
+            return false
+        }
+        return true
     }
 }
 
