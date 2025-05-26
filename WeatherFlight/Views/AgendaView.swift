@@ -18,11 +18,13 @@ struct AgendaView: View {
     private let textColor = Color(red: 0.3, green: 0.25, blue: 0.2)
     private let shadowColor = Color(red: 0.7, green: 0.65, blue: 0.6).opacity(0.3)
     
+    @State private var selectedFlight = 0
+    
     var groupedItems: [String: [AgendaItem]] {
-        if flightManager.flights.isEmpty {
+        if flightManager.flights[selectedFlight].agendaItems.isEmpty {
             return [:]
         }
-        return Dictionary(grouping: flightManager.flights[0].agendaItems) { $0.activity.destination }
+        return Dictionary(grouping: flightManager.flights[selectedFlight].agendaItems) { $0.activity.destination }
     }
     
     var body: some View {
@@ -53,6 +55,15 @@ struct AgendaView: View {
             }
             .navigationTitle("Bitácora de Viaje")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Picker("Selecciona un viaje", selection: $selectedFlight) {
+                        ForEach(flightManager.flights.count, id: \.self) { flightIdx in
+                            Text(flightManager.flights[flightIdx].name)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .colorScheme(.dark)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: exportToCalendar) {
                         HStack {

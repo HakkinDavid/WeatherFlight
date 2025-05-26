@@ -15,6 +15,8 @@ struct PlanView: View {
     @State private var agendaItems: [AgendaItem] = []
     @State private var showAddAlert = false
     @State private var showRemoveAlert = false
+    @State private var showSaveAlert = false
+    @State private var tripName: String = ""
 
     let activities = sampleActivities
     
@@ -91,6 +93,19 @@ struct PlanView: View {
                         }
                     }
                     
+                    if !agendaItems.isEmpty {
+                        Section(header: Text("Guardar viaje").foregroundColor(textColor).bold().font(.title2)) {
+                            TextField("Nombre del viaje", text: $tripName)
+                            Button("Guardar", action: {
+                                saveFlight()
+                            })
+                            .disabled(tripName.isEmpty)
+                            .alert("Viaje guardado", isPresented: $showSaveAlert) {
+                                Button("Cerrar", role: .cancel) {}
+                            }
+                        }
+                    }
+                    
                 }
                 .scrollContentBackground(.hidden) // No Form Background
                 .background(Color.clear)
@@ -147,6 +162,10 @@ struct PlanView: View {
             agendaItems.append(AgendaItem(activity: activity, date: DateRange(startDate: selectedDate, endDate: selectedDate)))
             showAddAlert = true
         }
+    }
+    
+    func saveFlight() {
+        flightManager.add(name: tripName.isEmpty ? "Viaje a \(selectedDestination?.name ?? "") - \(formattedDate(selectedDate))" : tripName, to: selectedDestination!, items: agendaItems)
     }
 }
 
