@@ -24,6 +24,7 @@ class WeatherPredictionService {
         let precipitation: Double
         let humidity: Double
         let wind: Double
+        let adjective: String
     }
 
     init() {
@@ -46,7 +47,7 @@ class WeatherPredictionService {
         return targetDate >= today && targetDate <= futureDate
     }
 
-    func fetchWeatherData(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?) -> Void) {
+    func fetchWeatherData(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?, String?) -> Void) {
         if WeatherPredictionService.isDateWithinForecastRange(date) {
             fetchWeatherFromApi(for: destination, date: date, completion: completion)
         } else {
@@ -54,7 +55,7 @@ class WeatherPredictionService {
         }
     }
 
-    private func fetchWeatherFromApi(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?) -> Void) {
+    private func fetchWeatherFromApi(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?, String?) -> Void) {
         let lat = destination.latitude
         let lon = destination.longitude
         let formattedDate = Self.formattedDateString(date)
@@ -64,35 +65,46 @@ class WeatherPredictionService {
         """
 
         guard let url = URL(string: urlStr) else {
-            completion(nil, "URL inválida")
+            completion(nil, nil, "URL inválida")
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    completion(nil, error.localizedDescription)
+                    completion(nil, nil, error.localizedDescription)
                     return
                 }
 
                 guard let data = data else {
-                    completion(nil, "No se recibieron datos")
+                    completion(nil, nil, "No se recibieron datos")
                     return
                 }
 
                 do {
                     var result = try JSONDecoder().decode(WeatherData.self, from: data)
                     result.season = Self.determineSeason(from: date)
-                    completion(result, nil)
+                    // Infer adjective from API data
+                    let precipitation = result.daily.precipitation_sum.first ?? 0
+                    let humidity = result.daily.relative_humidity_2m_mean.first ?? 0
+                    let adjective: String
+                    if precipitation > 5 {
+                        adjective = "lluvia"
+                    } else if humidity > 70 {
+                        adjective = "nublado"
+                    } else {
+                        adjective = "soleado"
+                    }
+                    completion(result, adjective, nil)
                 } catch {
-                    completion(nil, "Error al decodificar datos: \(error.localizedDescription)")
+                    completion(nil, nil, "Error al decodificar datos: \(error.localizedDescription)")
                 }
             }
         }.resume()
     }
 
-    private func fetchWeatherFromModel(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?) -> Void) {
-        if let prediction = predict(for: destination.name, date: date) {
+    private func fetchWeatherFromModel(for destination: Destination, date: Date, completion: @escaping (WeatherData?, String?, String?) -> Void) {
+        if let prediction = predictWeather(for: destination.name, date: date) {
             let daily = WeatherData.Daily(
                 temperature_2m_max: [prediction.temperature],
                 temperature_2m_min: [],
@@ -110,9 +122,9 @@ class WeatherPredictionService {
                 season: Self.determineSeason(from: date)
             )
 
-            completion(weatherData, nil)
+            completion(weatherData, prediction.adjective, nil)
         } else {
-            completion(nil, "No se pudo generar la predicción del clima")
+            completion(nil, nil, "No se pudo generar la predicción del clima")
         }
     }
 
@@ -134,19 +146,6 @@ class WeatherPredictionService {
         }
     }
 
-    func predict(for city: String, date: Date) -> (temperature: Double, precipitation: Double, humidity: Double, wind: Double)? {
-        guard let prediction = predictWeather(for: city, date: date) else {
-            return nil
-        }
-
-        return (
-            temperature: prediction.temperature,
-            precipitation: prediction.precipitation,
-            humidity: prediction.humidity,
-            wind: prediction.wind
-        )
-    }
-
     private func predictWeather(for city: String, date: Date) -> WeatherPrediction? {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM-dd"
@@ -159,11 +158,21 @@ class WeatherPredictionService {
             return nil
         }
 
+        let adjective: String
+        if precipitationValue > 5 {
+            adjective = "lluvia"
+        } else if humidityValue > 70 {
+            adjective = "nublado"
+        } else {
+            adjective = "soleado"
+        }
+
         return WeatherPrediction(
             temperature: temperatureValue,
             precipitation: precipitationValue,
             humidity: humidityValue,
-            wind: windValue
+            wind: windValue,
+            adjective: adjective
         )
     }
 

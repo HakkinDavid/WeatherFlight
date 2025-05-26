@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PlanView: View {
     @EnvironmentObject var flightManager: FlightManager
+    @State private var weatherAdjective: String? = nil
+    private let weatherService = WeatherPredictionService()
     @State private var selectedDestination: Destination? = destinations.first
     @State private var selectedActivities: [Activity] = []
     @State private var agendaItems: [AgendaItem] = []
@@ -58,7 +60,7 @@ struct PlanView: View {
                     .listRowBackground(Color.white.opacity(0.3))
                     
                     // Weather check
-                    Section {
+                    Section(header: Text("Clima: \(weatherAdjective ?? "Cargando...")").foregroundColor(textColor).bold()) {
                         NavigationLink(
                             destination: WeatherView(
                                 destination: selectedDestination ?? destinations[0],
@@ -84,12 +86,11 @@ struct PlanView: View {
                         }
                         .disabled(selectedDestination == nil)
                         .listRowBackground(Color.white.opacity(0.5))
+                        /*
                         .alert("Actividad añadida al plan para \(formattedDate(selectedDate))", isPresented: $showAddAlert) {
                             Button("Cerrar", role: .cancel) {}
                         }
-                        .alert("Actividad removida del plan", isPresented: $showRemoveAlert) {
-                            Button("Cerrar", role: .cancel) {}
-                        }
+                         */
                     }
                     
                     if !agendaItems.isEmpty {
@@ -126,6 +127,18 @@ struct PlanView: View {
             .toolbarBackground(Color.purple.opacity(0.1), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
         }
+        .onChange(of: selectedDate) { _ in
+            updateWeatherAdjective()
+        }
+        .onChange(of: selectedDestination) { _ in
+            updateWeatherAdjective()
+        }
+        .onAppear {
+            updateWeatherAdjective()
+        }
+        .alert("Actividad removida del plan", isPresented: $showRemoveAlert) {
+            Button("Cerrar", role: .cancel) {}
+        }
     }
     
     // Extraer la lista de actividades a una propiedad computada
@@ -134,6 +147,7 @@ struct PlanView: View {
             ForEach(filteredActivities) { activity in
                 ActivityRow(
                     activity: activity,
+                    isRecommended: (weatherAdjective != nil) ? activity.recommendedFor.contains(weatherAdjective!) : false,
                     isSelected: isActivitySelected(activity),
                     onTap: { toggleActivity(activity) }
                 )
@@ -150,7 +164,10 @@ struct PlanView: View {
             ForEach(agendaItems.sorted(by: {$0.date < $1.date}), id: \.id) { agendaItem in
                 AgendaItemRow(
                     agendaItem: agendaItem,
-                    onTap: { agendaItems.removeAll(where: {$0.id == agendaItem.id}) }
+                    onTap: {
+                        agendaItems.removeAll(where: {$0.id == agendaItem.id})
+                        showRemoveAlert = true
+                    }
                 )
                 .listRowBackground(Color.clear.opacity(0.2))
             }
@@ -160,12 +177,14 @@ struct PlanView: View {
         .background(Color.clear)
     }
     
-    // Filtrar actividades por destino seleccionado
+    // Filtrar actividades por destino seleccionado y aplicar recomendación según clima
     private var filteredActivities: [Activity] {
         guard let destination = selectedDestination else {
             return []
         }
-        return activities.filter { $0.destination == destination.name }
+
+        return activities
+            .filter { $0.destination == destination.name }
     }
     
     // Verificar si una actividad está seleccionada
@@ -191,15 +210,35 @@ struct PlanView: View {
     func resetPlan() {
         agendaItems.removeAll(keepingCapacity: false)
         selectedDestination = destinations.first
-        selectedDate = Date()
+        date = Calendar.current.startOfDay(for: Date())
+        selectedDate = date
         selectedActivities.removeAll(keepingCapacity: false)
         tripName = ""
+        weatherAdjective = ""
+    }
+    
+    private func updateWeatherAdjective() {
+        print("Actualizando adjetivo...")
+        guard let destination = selectedDestination else {
+            weatherAdjective = nil
+            return
+        }
+
+        weatherService.fetchWeatherData(for: destination, date: selectedDate) { data, adjective, error in
+            if let adjective {
+                weatherAdjective = adjective
+            } else {
+                weatherAdjective = nil
+                print("Error al obtener el adjetivo del clima: \(error ?? "No hay error especificado")")
+            }
+        }
     }
 }
 
 // Componente separado para la fila de actividad
 struct ActivityRow: View {
     let activity: Activity
+    let isRecommended: Bool
     let isSelected: Bool
     let onTap: () -> Void
     
@@ -208,6 +247,22 @@ struct ActivityRow: View {
             VStack(alignment: .leading) {
                 Text(activity.name).font(.headline)
                 Text(activity.description).font(.subheadline)
+                if isRecommended {
+                    Text("Recomendada")
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .padding(4)
+                        .background(Color.green.opacity(0.2))
+                        .cornerRadius(6)
+                }
+                else {
+                    Text("No recomendada")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .padding(4)
+                        .background(Color.red.opacity(0.2))
+                        .cornerRadius(6)
+                }
             }
             Spacer()
             Button(action: onTap) {

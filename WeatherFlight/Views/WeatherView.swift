@@ -179,7 +179,7 @@ struct WeatherView: View {
         
         dataSource = WeatherPredictionService.isDateWithinForecastRange(date) ? .api : .mlModel
         
-        predictionService.fetchWeatherData(for: destination, date: date) { data, error in
+        predictionService.fetchWeatherData(for: destination, date: date) { data, adjective, error in
             if let error = error {
                 self.errorMessage = error
             } else {
