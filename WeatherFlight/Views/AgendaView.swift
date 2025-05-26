@@ -204,6 +204,42 @@ struct AgendaView: View {
     }
     
     func exportToCalendar() {
-        // TODO: add this lol    }
+        let eventStore = EKEventStore()
+        eventStore.requestAccess(to: .event) { granted, error in
+            guard granted, error == nil else {
+                return
+            }
+            
+            let selected = selectedFlight
+            guard selected < flightManager.flights.count else { return }
+            
+            let flight = flightManager.flights[selected]
+            let calendar = eventStore.defaultCalendarForNewEvents
+            
+            for item in flight.agendaItems {
+                let event = EKEvent(eventStore: eventStore)
+                event.title = item.activity.name
+                event.notes = """
+                \(item.activity.description)
+                
+                Categoría: \(item.activity.category)
+                Recomendado para: \(item.activity.recommendedFor.joined(separator: ", "))
+                """
+                event.startDate = item.date.startDate
+                event.endDate = item.date.endDate
+                event.calendar = calendar
+                event.location = flight.destination.location
+                
+                do {
+                    try eventStore.save(event, span: .thisEvent)
+                } catch {
+                    print("Error al guardar el evento: \(error.localizedDescription)")
+                }
+            }
+            
+            DispatchQueue.main.async {
+                showingExportAlert = true
+            }
+        }
     }
 }

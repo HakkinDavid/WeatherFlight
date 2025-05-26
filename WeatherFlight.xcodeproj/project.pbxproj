@@ -29,9 +29,22 @@
 		68BF27EB2DD301C000619356 /* WeatherFlightUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeatherFlightUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		68376E032DE473DE00D85889 /* Exceptions for "WeatherFlight" folder in "WeatherFlight" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 68BF27CE2DD301BF00619356 /* WeatherFlight */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		68BF27D12DD301BF00619356 /* WeatherFlight */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				68376E032DE473DE00D85889 /* Exceptions for "WeatherFlight" folder in "WeatherFlight" target */,
+			);
 			path = WeatherFlight;
 			sourceTree = "<group>";
 		};
@@ -400,9 +413,11 @@
 				DEVELOPMENT_TEAM = 4VAQ6PKXRG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WeatherFlight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationUsageDescription = si;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = si;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Para guardar tu agenda";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Por favor, accede.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,9 +446,11 @@
 				DEVELOPMENT_TEAM = 4VAQ6PKXRG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WeatherFlight/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSLocationUsageDescription = si;
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = si;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Para guardar tu agenda";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Es necesaria.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Por favor, accede.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
